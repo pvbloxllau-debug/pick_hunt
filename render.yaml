@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: picker-hunt
+    runtime: docker
+    plan: free
+    envVars:
+      - key: DB_FILE
+        value: /data/picker_hunt.db
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
