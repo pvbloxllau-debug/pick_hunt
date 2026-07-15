@@ -267,25 +267,43 @@ def get_current_user(request: Request):
     conn.close()
     return user
 
-# Walmart spark SVG inline (6 petalos, color oficial #ffc220)
+# Spark Walmart: 6 petalos redondeados, amarillo oficial #ffc220
 _WALMART_SPARK_SVG = (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" '
-    'width="14" height="14" style="display:inline-block;vertical-align:middle;">'
+    'width="16" height="16" style="display:inline-block;vertical-align:middle;flex-shrink:0;">'
     '<g transform="translate(50,50)">'
-    '<ellipse rx="8" ry="22" fill="#0053e2"/>'
-    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(60)"/>'
-    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(120)"/>'
-    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(180)"/>'
-    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(240)"/>'
-    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(300)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="#ffc220"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="#ffc220" transform="rotate(60)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="#ffc220" transform="rotate(120)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="#ffc220" transform="rotate(180)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="#ffc220" transform="rotate(240)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="#ffc220" transform="rotate(300)"/>'
     '</g></svg>'
 )
 
+# Badge completo estilo logo oficial Walmart (marino oscuro, spark, divisor, texto blanco)
+_WALMART_BADGE_HTML = (
+    '<span style="background:#0a1628;color:white;font-weight:800;font-size:11px;'
+    'padding:4px 10px 4px 8px;border-radius:999px;'
+    'display:inline-flex;align-items:center;gap:6px;'
+    'box-shadow:0 1px 4px rgba(0,0,0,.35);">'
+    + _WALMART_SPARK_SVG
+    + '<span style="display:inline-block;width:1px;height:13px;'
+    'background:rgba(255,255,255,.35);flex-shrink:0;"></span>'
+    '<span style="letter-spacing:.02em;">Walmart</span>'
+    '</span>'
+)
+
 def _pts_badge(user: dict) -> str:
-    """Badge de puntos: spark Walmart para supervisores, estrella+pts para otros."""
+    """Badge de puntos: logo Walmart para supervisores, estrella+pts para otros."""
     if user['role'] == 'supervisor':
-        return f'{_WALMART_SPARK_SVG} Walmart'
-    return f"\u2b50 {user['points']} pts"
+        return _WALMART_BADGE_HTML
+    # Hunters y pickers: badge amarillo con estrella y puntos
+    return (
+        f'<span style="background:#ffc220;color:#111827;font-weight:900;font-size:11px;'
+        f'padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">'
+        f'&#11088; {user["points"]} pts</span>'
+    )
 
 
 # Helper template renderer to keep the code fully responsive & gorgeous
@@ -299,7 +317,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                 <p class="font-bold text-xs text-white">{user['full_name']}</p>
                 <p class="text-[9px] text-gray-300 uppercase tracking-widest">{user['role']}</p>
             </div>
-            <span class="bg-[#ffc220] text-gray-900 font-black text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
+            <span class="flex items-center gap-1">
                 {_pts_badge(user)}
             </span>
             <a href="/profile" class="hover:bg-white/20 p-1 rounded-full transition" title="Cambiar Contrasena">
