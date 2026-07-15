@@ -815,6 +815,9 @@ def dashboard_get(request: Request):
     conn = get_db()
     total_pickers = conn.execute("SELECT COUNT(*) FROM users WHERE role='picker'").fetchone()[0]
     total_hunters  = conn.execute("SELECT COUNT(*) FROM users WHERE role='hunter'").fetchone()[0]
+    team_members   = conn.execute(
+        "SELECT full_name, role FROM users WHERE role IN ('picker','hunter') ORDER BY role, full_name"
+    ).fetchall()
     # Cumplimiento = solo hunts de HOY; Protocolo Confirmado cuenta como resuelto
     _TODAY = "DATE(reported_at) = DATE('now')"
     _RESOLVED_STATUSES = "('Encontrado','Ajustado','Sin Stock','Protocolo Confirmado')"
@@ -826,6 +829,21 @@ def dashboard_get(request: Request):
 
     completitud_pct   = round(resolved_hunts / total_hunts * 100, 1) if total_hunts else 0.0
     completitud_color = "#16a34a" if completitud_pct >= 96 else "#dc2626"
+
+    # Lista de pickers y hunters para el recuadro Equipo
+    _ROLE_STYLE = {
+        'picker': ('background:#eff6ff;color:#1d4ed8;', 'Picker'),
+        'hunter': ('background:#f0fdf4;color:#15803d;', 'Hunter'),
+    }
+    team_members_html = ''.join(
+        f'<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">'
+        f'<span style="font-size:11px;font-weight:600;color:#111827;'
+        f'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["full_name"]}</span>'
+        f'<span style="{_ROLE_STYLE[m["role"]][0]}font-size:9px;font-weight:800;'
+        f'padding:2px 6px;border-radius:999px;flex-shrink:0;">{_ROLE_STYLE[m["role"]][1]}</span>'
+        f'</div>'
+        for m in team_members
+    ) or '<span style="font-size:10px;color:#9ca3af;">Sin integrantes</span>'
 
     can_report = user['role'] in ('picker', 'supervisor')
     can_hunt   = user['role'] in ('hunter', 'supervisor')
@@ -897,11 +915,13 @@ def dashboard_get(request: Request):
             </div>
         </div>
         
-        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center justify-between">
-            <div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Equipo</p>
-                <h3 class="text-2xl font-black text-gray-900 mt-0.5">{total_pickers + total_hunters}</h3>
-                <p class="text-[9px] text-gray-500 mt-0.5">{total_pickers} pickers · {total_hunters} hunters</p>
+                <span class="text-[10px] font-black text-[#0053e2]">{total_pickers + total_hunters}</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                {team_members_html}
             </div>
         </div>
 
