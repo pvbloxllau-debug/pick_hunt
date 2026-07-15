@@ -1310,6 +1310,51 @@ def api_hunts_list(request: Request, search: str = ""):
     return HTMLResponse(content=_build_hunts_html(user, search))
 
 
+def _build_historial_html(hist_rows: list) -> str:
+    """HTML del bloque 'Mis ultimas alertas' para el picker (ultimas 3 resueltas)."""
+    STATUS_STYLE = {
+        'Encontrado':           ('background:#dcfce7;color:#166534;', 'Encontrado'),
+        'Ajustado':             ('background:#ccfbf1;color:#0f766e;', 'Ajustado'),
+        'Sin Stock':            ('background:#fee2e2;color:#991b1b;', 'Sin Stock'),
+        'No Encontrado':        ('background:#fee2e2;color:#991b1b;', 'No Encontrado'),
+        'Protocolo Confirmado': ('background:#dcfce7;color:#166534;', 'Protocolo OK'),
+        'Protocolo Aplicado':   ('background:#f3f4f6;color:#374151;', 'Protocolo Aplicado'),
+    }
+    hist_cards = ''
+    for h in hist_rows:
+        sty, label = STATUS_STYLE.get(h['status'], ('background:#f3f4f6;color:#374151;', h['status']))
+        hunter_line = (f"<span style='font-size:10px;color:#6b7280;'>Hunter: {h['assigned_to']}</span>"
+                       if h['assigned_to'] else '')
+        delta_line = ''
+        if h['status'] == 'Ajustado' and h['inventory_delta'] is not None:
+            sign = '+' if h['inventory_delta'] >= 0 else ''
+            delta_line = (f"<span style='font-size:10px;color:#0f766e;font-weight:700;'>"
+                          f"{sign}{h['inventory_delta']} un.</span>")
+        hist_cards += f"""
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;
+                    padding:10px 12px;background:white;border-radius:10px;border:1px solid #e5e7eb;">
+            <div style="flex:1;min-width:0;">
+                <p style="font-size:11px;font-weight:700;color:#111827;
+                          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;">{h['item_name']}</p>
+                <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
+                    <span style="font-size:10px;color:#6b7280;">{h['quantity']} un.</span>
+                    {hunter_line}
+                    {delta_line}
+                </div>
+            </div>
+            <span style="flex-shrink:0;{sty}font-size:9px;font-weight:900;
+                         padding:3px 8px;border-radius:999px;white-space:nowrap;">{label}</span>
+        </div>"""
+    return f"""
+    <div style="margin-top:16px;padding:0 2px;">
+        <p style="font-size:10px;font-weight:900;color:#6b7280;text-transform:uppercase;
+                  letter-spacing:.08em;margin:0 0 8px;">Mis ultimas 3 alertas</p>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+            {hist_cards}
+        </div>
+    </div>"""
+
+
 def _build_hunts_html(user: dict, search: str = "") -> str:
     """Construye el HTML de la lista de hunts. Llamado por el route y por el dashboard."""
     can_hunt   = user['role'] in ('hunter', 'supervisor')
@@ -1354,14 +1399,18 @@ def _build_hunts_html(user: dict, search: str = "") -> str:
         ).fetchall()
 
     conn.close()
-    
+
     if not hunts:
-        return """
+        empty_html = """
         <div class="text-center py-8 text-gray-400">
             <p class="text-xs font-bold">Todo despejado por aqui!</p>
             <p class="text-[10px] mt-0.5">No hay busquedas activas con ese criterio.</p>
         </div>
         """
+        # Picker: aunque no haya activos, mostrar historial de las 3 ultimas
+        if user['role'] == 'picker' and hist_rows:
+            return empty_html + _build_historial_html(hist_rows)
+        return empty_html
         
     html = ""
     for hunt in hunts:
@@ -1587,41 +1636,7 @@ def _build_hunts_html(user: dict, search: str = "") -> str:
         
     # ── Historial ultimas 3 alertas (solo picker) ───────────────────────────
     if user['role'] == 'picker' and hist_rows:
-            STATUS_STYLE = {
-                'Encontrado':           ('background:#dcfce7;color:#166534;', 'Encontrado'),
-                'Ajustado':             ('background:#ccfbf1;color:#0f766e;', 'Ajustado'),
-                'Sin Stock':            ('background:#fee2e2;color:#991b1b;', 'Sin Stock'),
-                'No Encontrado':        ('background:#fee2e2;color:#991b1b;', 'No Encontrado'),
-                'Protocolo Confirmado': ('background:#dcfce7;color:#166534;', 'Protocolo OK'),
-                'Protocolo Aplicado':   ('background:#f3f4f6;color:#374151;', 'Protocolo Aplicado'),
-            }
-            hist_cards = ''
-            for h in hist_rows:
-                sty, label = STATUS_STYLE.get(h['status'], ('background:#f3f4f6;color:#374151;', h['status']))
-                hunter_line = f"<span style='font-size:10px;color:#6b7280;'>Hunter: {h['assigned_to']}</span>" if h['assigned_to'] else ''
-                delta_line = ''
-                if h['status'] == 'Ajustado' and h['inventory_delta'] is not None:
-                    sign = '+' if h['inventory_delta'] >= 0 else ''
-                    delta_line = f"<span style='font-size:10px;color:#0f766e;font-weight:700;'>{sign}{h['inventory_delta']} un.</span>"
-                hist_cards += f"""
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:white;border-radius:10px;border:1px solid #e5e7eb;">
-                    <div style="flex:1;min-width:0;">
-                        <p style="font-size:11px;font-weight:700;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;">{h['item_name']}</p>
-                        <div style="display:flex;gap:6px;align-items:center;margin-top:2px;">
-                <span style="font-size:10px;color:#6b7280;">{h['quantity']} un.</span>
-                            {hunter_line}
-                            {delta_line}
-                        </div>
-                    </div>
-                    <span style="flex-shrink:0;{sty}font-size:9px;font-weight:900;padding:3px 8px;border-radius:999px;white-space:nowrap;">{label}</span>
-                </div>"""
-            html += f"""
-            <div style="margin-top:16px;padding:0 2px;">
-                <p style="font-size:10px;font-weight:900;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px;">Mis ultimas alertas</p>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                    {hist_cards}
-                </div>
-            </div>"""
+        html += _build_historial_html(hist_rows)
 
     html += """
     <div id="image-lightbox" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4" onclick="this.classList.add('hidden')">
