@@ -1407,12 +1407,9 @@ def api_equipo_online(request: Request):
         rows_html = '<span style="font-size:10px;color:#9ca3af;">Sin integrantes</span>'
 
     html = (
-        f'<div class="flex items-center justify-between mb-2">'
         f'<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Equipo</p>'
-        f'<span style="background:#dcfce7;color:#15803d;font-size:9px;font-weight:900;'
-        f'padding:2px 7px;border-radius:999px;"> {online_count} en linea</span>'
-        f'</div>'
-        f'<div style="display:flex;flex-direction:column;gap:5px;">{rows_html}</div>'
+        f'<h3 class="text-2xl font-black text-gray-900 mt-0.5">{online_count}</h3>'
+        f'<p class="text-[9px] text-[#16a34a] font-bold mt-0.5">● conectados ahora</p>'
     )
     return HTMLResponse(content=html)
 
