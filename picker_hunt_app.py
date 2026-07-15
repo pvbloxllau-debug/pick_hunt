@@ -244,6 +244,10 @@ class ConnectionManager:
             except Exception:
                 self.disconnect(ws, username)
 
+    def online_usernames(self) -> set:
+        """Usernames con al menos 1 conexion WebSocket activa."""
+        return {u for u, socks in self._by_user.items() if socks}
+
 manager = ConnectionManager()
 
 @app.websocket("/ws")
@@ -915,14 +919,12 @@ def dashboard_get(request: Request):
             </div>
         </div>
         
-        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Equipo</p>
-                <span class="text-[10px] font-black text-[#0053e2]">{total_pickers + total_hunters}</span>
-            </div>
-            <div class="flex flex-col gap-1">
-                {team_members_html}
-            </div>
+        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm"
+             hx-get="/api/equipo-online"
+             hx-trigger="load, every 10s"
+             hx-swap="innerHTML">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Equipo</p>
+            <p class="text-[10px] text-gray-400 mt-1">Cargando...</p>
         </div>
 
         <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center justify-between">
@@ -1359,6 +1361,59 @@ def api_feed(request: Request):
             {edit_btn}
         </div>
         """
+    return HTMLResponse(content=html)
+
+
+@app.get("/api/equipo-online")
+def api_equipo_online(request: Request):
+    """Retorna el HTML del recuadro Equipo con usuarios picker/hunter conectados en vivo."""
+    if not get_current_user(request):
+        return HTMLResponse(content="")
+
+    online = manager.online_usernames()
+    conn = get_db()
+    members = conn.execute(
+        "SELECT username, full_name, role FROM users "
+        "WHERE role IN ('picker','hunter') ORDER BY role, full_name"
+    ).fetchall()
+    conn.close()
+
+    _ROLE_STYLE = {
+        'picker': ('background:#eff6ff;color:#1d4ed8;', 'Picker'),
+        'hunter': ('background:#f0fdf4;color:#15803d;', 'Hunter'),
+    }
+    online_count = 0
+    rows_html = ''
+    for m in members:
+        is_online = m['username'] in online
+        if is_online:
+            online_count += 1
+        dot = ('<span style="width:7px;height:7px;border-radius:50%;'
+               'background:#16a34a;display:inline-block;flex-shrink:0;"></span>'
+               if is_online else
+               '<span style="width:7px;height:7px;border-radius:50%;'
+               'background:#d1d5db;display:inline-block;flex-shrink:0;"></span>')
+        opacity = '1.0' if is_online else '0.45'
+        sty, label = _ROLE_STYLE[m['role']]
+        rows_html += (
+            f'<div style="display:flex;align-items:center;gap:6px;opacity:{opacity}">'
+            f'{dot}'
+            f'<span style="font-size:11px;font-weight:600;color:#111827;flex:1;'
+            f'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["full_name"]}</span>'
+            f'<span style="{sty}font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;flex-shrink:0;">'
+            f'{label}</span></div>'
+        )
+    if not rows_html:
+        rows_html = '<span style="font-size:10px;color:#9ca3af;">Sin integrantes</span>'
+
+    html = (
+        f'<div class="flex items-center justify-between mb-2">'
+        f'<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Equipo</p>'
+        f'<span style="background:#dcfce7;color:#15803d;font-size:9px;font-weight:900;'
+        f'padding:2px 7px;border-radius:999px;"> {online_count} en linea</span>'
+        f'</div>'
+        f'<div style="display:flex;flex-direction:column;gap:5px;">{rows_html}</div>'
+    )
     return HTMLResponse(content=html)
 
 @app.get("/api/hunts-list")
