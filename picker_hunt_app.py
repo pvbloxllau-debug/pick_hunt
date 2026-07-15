@@ -267,6 +267,27 @@ def get_current_user(request: Request):
     conn.close()
     return user
 
+# Walmart spark SVG inline (6 petalos, color oficial #ffc220)
+_WALMART_SPARK_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" '
+    'width="14" height="14" style="display:inline-block;vertical-align:middle;">'
+    '<g transform="translate(50,50)">'
+    '<ellipse rx="8" ry="22" fill="#0053e2"/>'
+    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(60)"/>'
+    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(120)"/>'
+    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(180)"/>'
+    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(240)"/>'
+    '<ellipse rx="8" ry="22" fill="#0053e2" transform="rotate(300)"/>'
+    '</g></svg>'
+)
+
+def _pts_badge(user: dict) -> str:
+    """Badge de puntos: spark Walmart para supervisores, estrella+pts para otros."""
+    if user['role'] == 'supervisor':
+        return f'{_WALMART_SPARK_SVG} Walmart'
+    return f"\u2b50 {user['points']} pts"
+
+
 # Helper template renderer to keep the code fully responsive & gorgeous
 def render_template(content_html: str, user=None, active_tab: str = "dashboard"):
     user_nav = ""
@@ -279,7 +300,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                 <p class="text-[9px] text-gray-300 uppercase tracking-widest">{user['role']}</p>
             </div>
             <span class="bg-[#ffc220] text-gray-900 font-black text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                ⭐ {user['points']} pts
+                {_pts_badge(user)}
             </span>
             <a href="/profile" class="hover:bg-white/20 p-1 rounded-full transition" title="Cambiar Contrasena">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -2489,7 +2510,7 @@ def profile_get(request: Request, msg: str = ""):
             <p class="font-black text-gray-900 text-base leading-tight">{user['full_name']}</p>
             <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">{user['role']}</p>
             <span class="inline-flex items-center gap-1 bg-yellow-50 text-yellow-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-yellow-200 mt-1">
-              ⭐ {user['points']} pts &nbsp;·&nbsp; {user['hunts_completed']} hunts
+              {_pts_badge(user)}
             </span>
           </div>
         </div>
