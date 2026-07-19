@@ -668,31 +668,85 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <!-- Modal: Notificacion foto ubicacion (picker) - compacto -->
-        <div id="sala-found-modal" class="fixed inset-0 bg-black/70 z-50 flex items-end justify-center hidden">
-            <div class="bg-white rounded-t-2xl p-4 w-full max-w-sm shadow-2xl">
-                <!-- Fila compacta: thumbnail + texto + cerrar -->
-                <div class="flex items-center gap-3 mb-3">
-                    <!-- Thumbnail 64x64 clickeable para ver en grande -->
-                    <div id="sala-found-thumb-wrap"
-                         class="w-16 h-16 rounded-xl overflow-hidden bg-green-50 border border-green-200 flex-shrink-0 cursor-pointer"
-                         onclick="var img=document.getElementById('sala-found-photo');if(img&&img.src&&img.src!==window.location.href)showPhotoLightBox(img.src);">
-                        <img id="sala-found-photo" src="#" alt="" class="w-full h-full object-cover" />
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="font-black text-green-700 text-sm leading-tight">Encontrado en sala</p>
-                        <p id="sala-found-item" class="text-xs text-gray-700 font-semibold mt-0.5 truncate"></p>
-                        <p id="sala-found-hunter" class="text-[10px] text-gray-400 mt-0.5"></p>
-                    </div>
-                    <button type="button" onclick="closeSalaFoundModal()" class="text-gray-300 hover:text-gray-500 text-2xl font-bold leading-none flex-shrink-0">&times;</button>
+        <!-- Banner notificacion (picker): desliza desde arriba, no bloquea pantalla -->
+        <div id="sala-notif-banner"
+             style="position:fixed;top:0;left:0;right:0;z-index:9998;
+                    transform:translateY(-110%);transition:transform .35s cubic-bezier(.2,.8,.4,1);
+                    padding:env(safe-area-inset-top,0) 0 0;pointer-events:auto;">
+            <div style="background:#15803d;color:white;padding:12px 14px;
+                        display:flex;align-items:center;gap:10px;
+                        box-shadow:0 4px 24px rgba(0,0,0,.3);">
+                <!-- Icono ubicacion -->
+                <div style="flex-shrink:0;width:38px;height:38px;background:rgba(255,255,255,.18);
+                            border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
-                <!-- Hint tap para ver foto grande (solo si hay foto) -->
-                <p id="sala-found-tap-hint" class="hidden text-[10px] text-gray-400 text-center mb-2">Toca la imagen para verla en grande</p>
-                <button type="button" onclick="closeSalaFoundModal()" class="w-full bg-green-600 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-green-700 transition">Entendido</button>
+                <!-- Texto -->
+                <div style="flex:1;min-width:0;">
+                    <p style="font-size:10px;font-weight:900;margin:0;letter-spacing:.04em;opacity:.85;">PRODUCTO EN SALA</p>
+                    <p id="sala-notif-item" style="font-size:13px;font-weight:900;margin:1px 0 0;
+                        overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></p>
+                    <p id="sala-notif-hunter" style="font-size:10px;margin:1px 0 0;opacity:.75;"></p>
+                </div>
+                <!-- Boton ver foto (aparece cuando foto esta lista) -->
+                <button id="sala-notif-ver-btn" onclick="openSalaPhotoSheet()"
+                        style="background:white;color:#15803d;border:none;border-radius:8px;
+                               padding:7px 13px;font-size:11px;font-weight:900;cursor:pointer;
+                               white-space:nowrap;flex-shrink:0;display:none;">Ver foto</button>
+                <!-- Cerrar -->
+                <button onclick="closeSalaNotif()"
+                        style="background:none;border:none;color:rgba(255,255,255,.6);
+                               font-size:22px;font-weight:900;cursor:pointer;
+                               padding:0 0 0 2px;line-height:1;flex-shrink:0;">&times;</button>
             </div>
         </div>
 
-        <script src="/js/app.js?v=12" defer></script>
+        <!-- Sheet foto ubicacion (picker): sube desde abajo al tocar "Ver foto" -->
+        <div id="sala-photo-sheet-overlay"
+             style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0);
+                    pointer-events:none;transition:background .3s;"
+             onclick="if(event.target===this)closeSalaPhotoSheet();">
+            <div id="sala-photo-sheet"
+                 style="position:absolute;bottom:0;left:0;right:0;
+                        background:white;border-radius:20px 20px 0 0;
+                        padding:12px 16px 24px;
+                        transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.8,.4,1);
+                        max-width:500px;margin:0 auto;">
+                <!-- Handle indicator -->
+                <div style="width:40px;height:4px;background:#e5e7eb;border-radius:2px;margin:0 auto 14px;"></div>
+                <!-- Header: texto + cerrar -->
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:14px;font-weight:900;color:#15803d;margin:0;">Esta en sala</p>
+                        <p id="sala-sheet-item" style="font-size:13px;font-weight:700;color:#111827;
+                            margin:3px 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></p>
+                        <p id="sala-sheet-hunter" style="font-size:11px;color:#9ca3af;margin:2px 0 0;"></p>
+                    </div>
+                    <button onclick="closeSalaPhotoSheet()"
+                            style="background:none;border:none;color:#d1d5db;font-size:24px;
+                                   font-weight:900;cursor:pointer;line-height:1;flex-shrink:0;margin-left:12px;">&times;</button>
+                </div>
+                <!-- Imagen 4:3 — formato natural de camara mobile -->
+                <div style="width:100%;aspect-ratio:4/3;background:#f3f4f6;border-radius:14px;
+                            overflow:hidden;position:relative;margin-bottom:16px;">
+                    <div id="sala-sheet-loading"
+                         style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                        <p style="color:#9ca3af;font-size:12px;margin:0;">Cargando foto...</p>
+                    </div>
+                    <img id="sala-sheet-photo" src="#" alt="Ubicacion del producto"
+                         style="width:100%;height:100%;object-fit:contain;display:none;"
+                         onload="this.style.display='block';
+                                 var ld=document.getElementById('sala-sheet-loading');
+                                 if(ld)ld.style.display='none';" />
+                </div>
+                <button onclick="closeSalaPhotoSheet()"
+                        style="width:100%;background:#15803d;color:white;border:none;
+                               border-radius:12px;padding:14px;font-size:14px;
+                               font-weight:900;cursor:pointer;">Entendido</button>
+            </div>
+        </div>
+
+        <script src="/js/app.js?v=13" defer></script>
     </body>
     </html>
     """

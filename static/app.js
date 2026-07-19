@@ -522,38 +522,92 @@
                 });
         }
 
-        /* --- Sala Found Notification Modal (picker recibe foto) --- */
+        /* --- Sala Notif Banner + Photo Sheet (picker recibe notificacion de producto en sala) --- */
+        var _salaNotifTimer = null;
+        var _salaNotifPhotoUrl = null;
+        var _salaNotifItem = '';
+        var _salaNotifHunter = '';
+
         function showSalaFoundModal(huntId, item, hunter) {
-            var itemEl    = document.getElementById('sala-found-item');
-            var hunterEl  = document.getElementById('sala-found-hunter');
-            var thumbWrap = document.getElementById('sala-found-thumb-wrap');
-            var img       = document.getElementById('sala-found-photo');
-            var hint      = document.getElementById('sala-found-tap-hint');
-            var modal     = document.getElementById('sala-found-modal');
-            if (itemEl)   itemEl.textContent  = item || '';
-            if (hunterEl) hunterEl.textContent = hunter ? 'Hunter: ' + hunter : '';
-            // Resetear thumbnail
-            if (img)       img.src = '#';
-            if (thumbWrap) thumbWrap.style.background = '#f0fdf4';
-            if (hint)      hint.classList.add('hidden');
-            if (modal)     modal.classList.remove('hidden');
-            // Cargar foto y meter en thumbnail
+            // Alias para compatibilidad con WS handler existente
+            _salaNotifItem   = item || '';
+            _salaNotifHunter = hunter || '';
+            _salaNotifPhotoUrl = null;
+
+            var notifItem    = document.getElementById('sala-notif-item');
+            var notifHunter  = document.getElementById('sala-notif-hunter');
+            var verBtn       = document.getElementById('sala-notif-ver-btn');
+            var banner       = document.getElementById('sala-notif-banner');
+            if (notifItem)   notifItem.textContent   = item || '';
+            if (notifHunter) notifHunter.textContent = hunter ? 'Hunter: ' + hunter : '';
+            if (verBtn)      verBtn.style.display = 'none'; // ocultar hasta tener foto
+
+            // Mostrar banner (desliza hacia abajo)
+            if (banner) banner.style.transform = 'translateY(0)';
+
+            // Auto-cierre 20 seg
+            if (_salaNotifTimer) clearTimeout(_salaNotifTimer);
+            _salaNotifTimer = setTimeout(closeSalaNotif, 20000);
+
+            // Cargar foto en background
             if (huntId) {
                 fetch('/api/hunts/' + huntId + '/location-photo')
                     .then(function(r) { return r.json(); })
                     .then(function(d) {
-                        if (d.photo && img) {
-                            img.src = d.photo;
-                            if (hint) hint.classList.remove('hidden');
+                        if (d.photo) {
+                            _salaNotifPhotoUrl = d.photo;
+                            // Mostrar boton "Ver foto" ahora que la tenemos
+                            if (verBtn) verBtn.style.display = 'block';
                         }
                     })
                     .catch(function() {});
             }
         }
-        function closeSalaFoundModal() {
-            var modal = document.getElementById('sala-found-modal');
-            if (modal) modal.classList.add('hidden');
+
+        function closeSalaNotif() {
+            if (_salaNotifTimer) { clearTimeout(_salaNotifTimer); _salaNotifTimer = null; }
+            var banner = document.getElementById('sala-notif-banner');
+            if (banner) banner.style.transform = 'translateY(-110%)';
         }
+
+        function openSalaPhotoSheet() {
+            closeSalaNotif();
+            var overlay  = document.getElementById('sala-photo-sheet-overlay');
+            var sheet    = document.getElementById('sala-photo-sheet');
+            var sheetItem    = document.getElementById('sala-sheet-item');
+            var sheetHunter  = document.getElementById('sala-sheet-hunter');
+            var sheetPhoto   = document.getElementById('sala-sheet-photo');
+            var sheetLoading = document.getElementById('sala-sheet-loading');
+
+            if (sheetItem)   sheetItem.textContent   = _salaNotifItem;
+            if (sheetHunter) sheetHunter.textContent = _salaNotifHunter ? 'Hunter: ' + _salaNotifHunter : '';
+
+            // Resetear imagen
+            if (sheetPhoto)   { sheetPhoto.src = '#'; sheetPhoto.style.display = 'none'; }
+            if (sheetLoading) sheetLoading.style.display = 'flex';
+
+            // Animar apertura
+            if (overlay) { overlay.style.pointerEvents = 'auto'; overlay.style.background = 'rgba(0,0,0,.6)'; }
+            if (sheet)   sheet.style.transform = 'translateY(0)';
+
+            // Cargar foto si la tenemos
+            if (_salaNotifPhotoUrl && sheetPhoto) {
+                sheetPhoto.src = _salaNotifPhotoUrl;
+                // onload del img se encarga de mostrarla y ocultar loading
+            }
+        }
+
+        function closeSalaPhotoSheet() {
+            var overlay = document.getElementById('sala-photo-sheet-overlay');
+            var sheet   = document.getElementById('sala-photo-sheet');
+            if (sheet)   sheet.style.transform = 'translateY(100%)';
+            if (overlay) {
+                overlay.style.background = 'rgba(0,0,0,0)';
+                setTimeout(function() { overlay.style.pointerEvents = 'none'; }, 350);
+            }
+        }
+
+        function closeSalaFoundModal() { closeSalaNotif(); closeSalaPhotoSheet(); }
 
         /* --- Photo lightbox --- */
         function showPhotoLightBox(src) {
