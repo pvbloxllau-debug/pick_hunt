@@ -260,6 +260,21 @@
             return false;
         }
 
+        /* --- Picker confirma retiro del producto --- */
+        function pickerConfirm(huntId) {
+            fetch('/api/hunts/' + huntId + '/picker-confirm', { method: 'POST', credentials: 'same-origin' })
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    if (d.ok) {
+                        showToast('Retiro confirmado', 'green');
+                        // Recargar alertas para mostrar badge Retirado
+                        var q = document.getElementById('search-input');
+                        loadHunts(q ? q.value : '');
+                    }
+                })
+                .catch(function() { showToast('Error de red', 'red'); });
+        }
+
         /* --- Warn Hunter (picker llama al hunter) --- */
         function warnHunter(huntId) {
             fetch('/api/hunts/' + huntId + '/warn-hunter', { method: 'POST' })

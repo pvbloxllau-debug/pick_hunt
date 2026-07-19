@@ -85,7 +85,8 @@ def init_db():
         ("resolved_at",      "TIMESTAMP"),
         ("found_location",   "TEXT"),  # 'sala' | 'bodega' | NULL
         ("protocolo_at",     "TIMESTAMP"),  # cuando el picker aplico protocolo
-        ("location_photo",   "TEXT"),  # foto del hunter al encontrar en sala
+        ("location_photo",        "TEXT"),  # foto del hunter al encontrar en sala
+        ("picker_retrieved_at",    "TIMESTAMP"),  # cuando el picker confirmo retiro
     ]:
         try:
             cursor.execute(f"ALTER TABLE hunts ADD COLUMN {_col} {_def}")
@@ -751,7 +752,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=15" defer></script>
+        <script src="/js/app.js?v=16" defer></script>
     </body>
     </html>
     """
@@ -1564,6 +1565,22 @@ def _build_historial_html(hist_rows: list) -> str:
                 f" style='width:38px;height:38px;object-fit:cover;border-radius:8px;"
                 f"border:2px solid #16a34a;cursor:zoom-in;flex-shrink:0;' title='Ver foto de ubicacion' />"
             )
+        # Boton check retiro (solo Encontrado/Ajustado, badge si ya confirmo)
+        retrieved = h['picker_retrieved_at'] if 'picker_retrieved_at' in h.keys() else None
+        check_btn = ''
+        if h['status'] in ('Encontrado', 'Ajustado'):
+            if retrieved:
+                check_btn = "<span style='flex-shrink:0;background:#dcfce7;color:#166534;font-size:9px;font-weight:900;padding:3px 8px;border-radius:999px;border:1px solid #bbf7d0;'>Retirado</span>"
+            else:
+                check_btn = (
+                    f"<button onclick=\"pickerConfirm({h['id']})\""
+                    f" style='flex-shrink:0;width:34px;height:34px;border-radius:50%;border:2px solid #16a34a;"
+                    f"background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;'"
+                    f" title='Confirmar retiro'>"
+                    f"<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='#16a34a' stroke-width='3'>"
+                    f"<path stroke-linecap='round' stroke-linejoin='round' d='M5 13l4 4L19 7'/></svg>"
+                    f"</button>"
+                )
         hist_cards += f"""
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;
                     padding:10px 12px;background:white;border-radius:10px;border:1px solid #e5e7eb;">
@@ -1577,6 +1594,7 @@ def _build_historial_html(hist_rows: list) -> str:
                 </div>
             </div>
             {photo_thumb}
+            {check_btn}
             <span style="flex-shrink:0;{sty}font-size:9px;font-weight:900;
                          padding:3px 8px;border-radius:999px;white-space:nowrap;">{label}</span>
         </div>"""
@@ -2092,6 +2110,42 @@ def api_get_location_photo(request: Request, hunt_id: int):
     if not row:
         raise HTTPException(status_code=404, detail="Hunt no encontrado")
     return {"photo": row["location_photo"]}
+
+
+@app.post("/api/hunts/{hunt_id}/picker-confirm")
+async def api_picker_confirm(request: Request, hunt_id: int):
+    """Picker confirma que ya retiro el producto. Notifica al hunter."""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=403, detail="Not logged in")
+    if user['role'] not in ('picker', 'supervisor'):
+        raise HTTPException(status_code=403, detail="Solo pickers pueden confirmar retiro")
+
+    conn = get_db()
+    hunt = conn.execute("SELECT * FROM hunts WHERE id=?", (hunt_id,)).fetchone()
+    if not hunt:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Hunt no encontrado")
+
+    conn.execute(
+        "UPDATE hunts SET picker_retrieved_at=CURRENT_TIMESTAMP WHERE id=?",
+        (hunt_id,)
+    )
+    conn.commit()
+
+    # Notificar al hunter que resolvio este hunt
+    hunter_row = conn.execute(
+        "SELECT username FROM users WHERE full_name=?", (hunt['assigned_to'],)
+    ).fetchone() if hunt['assigned_to'] else None
+    conn.close()
+
+    if hunter_row:
+        await manager.notify_user(
+            hunter_row['username'],
+            f"toast:green|Retiro confirmado: '{hunt['item_name']}' ya fue retirado por {user['full_name']}"
+        )
+
+    return {"ok": True}
 
 
 class BannerPayload(BaseModel):
