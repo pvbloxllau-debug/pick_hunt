@@ -638,59 +638,61 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
 
         {BOTTOM_NAV}
 
-        <!-- Modal: En Sala con Foto (hunter) -->
-        <div id="sala-photo-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden">
-            <div class="bg-white rounded-2xl p-5 mx-4 w-full max-w-sm shadow-2xl">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-black text-lg text-green-700">En Sala</h3>
+        <!-- Modal: En Sala con Foto (hunter) - auto-envia al elegir foto -->
+        <div id="sala-photo-modal" class="fixed inset-0 bg-black/60 z-50 flex items-end justify-center hidden">
+            <div class="bg-white rounded-t-2xl p-5 w-full max-w-sm shadow-2xl">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-black text-base text-green-700">En Sala</h3>
                     <button type="button" onclick="closeSalaPhotoModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold leading-none">&times;</button>
                 </div>
-                <p id="sala-photo-item-name" class="text-sm text-gray-600 mb-4 font-semibold"></p>
+                <p id="sala-photo-item-name" class="text-xs text-gray-500 mb-4 font-semibold truncate"></p>
+                <!-- Botones camara/galeria: al elegir foto se envia automaticamente -->
                 <div id="sala-photo-buttons" class="flex gap-3 mb-3">
-                    <button type="button" onclick="triggerCamera('sala-')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-3 rounded-xl flex flex-col items-center gap-1 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <button type="button" onclick="triggerCamera('sala-')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-4 rounded-xl flex flex-col items-center gap-1 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         Camara
                     </button>
-                    <button type="button" onclick="triggerGallery('sala-')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-3 rounded-xl flex flex-col items-center gap-1 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <button type="button" onclick="triggerGallery('sala-')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-4 rounded-xl flex flex-col items-center gap-1 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         Galeria
                     </button>
                 </div>
                 <input id="sala-camera-only-input" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewSalaPhoto(this)" />
                 <input id="sala-gallery-only-input" type="file" accept="image/*" class="hidden" onchange="previewSalaPhoto(this)" />
-                <div id="sala-photo-preview-container" class="hidden relative w-full h-44 bg-black rounded-xl overflow-hidden mb-3 border border-gray-200">
-                    <img id="sala-photo-preview" src="#" alt="Preview" class="w-full h-full object-contain" />
-                    <button type="button" onclick="clearSalaPhoto()" class="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full shadow hover:bg-red-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+                <!-- Estado cargando (se muestra al elegir foto) -->
+                <div id="sala-upload-state" class="hidden text-center py-5">
+                    <p class="text-green-600 font-black text-sm">Enviando...</p>
+                    <p class="text-gray-400 text-xs mt-1">Subiendo foto de ubicacion</p>
                 </div>
-                <p class="text-[10px] text-gray-400 text-center mb-4">Foto opcional - ayuda al picker a encontrarlo rapido</p>
-                <div class="flex gap-3">
-                    <button type="button" onclick="submitSalaFound(false)" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl text-sm hover:bg-gray-200 transition">Sin foto</button>
-                    <button type="button" onclick="submitSalaFound(true)" id="sala-confirm-btn" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-green-700 transition">Confirmar</button>
-                </div>
+                <button type="button" onclick="submitSalaFound(false)" id="sala-no-photo-btn" class="w-full mt-1 text-gray-400 text-xs font-semibold py-2 hover:text-gray-600 transition">Enviar sin foto</button>
             </div>
         </div>
 
-        <!-- Modal: Notificacion foto ubicacion (picker) -->
-        <div id="sala-found-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
-            <div class="bg-white rounded-2xl p-5 mx-4 w-full max-w-sm shadow-2xl">
-                <div class="text-center mb-3">
-                    <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        <!-- Modal: Notificacion foto ubicacion (picker) - compacto -->
+        <div id="sala-found-modal" class="fixed inset-0 bg-black/70 z-50 flex items-end justify-center hidden">
+            <div class="bg-white rounded-t-2xl p-4 w-full max-w-sm shadow-2xl">
+                <!-- Fila compacta: thumbnail + texto + cerrar -->
+                <div class="flex items-center gap-3 mb-3">
+                    <!-- Thumbnail 64x64 clickeable para ver en grande -->
+                    <div id="sala-found-thumb-wrap"
+                         class="w-16 h-16 rounded-xl overflow-hidden bg-green-50 border border-green-200 flex-shrink-0 cursor-pointer"
+                         onclick="var img=document.getElementById('sala-found-photo');if(img&&img.src&&img.src!==window.location.href)showPhotoLightBox(img.src);">
+                        <img id="sala-found-photo" src="#" alt="" class="w-full h-full object-cover" />
                     </div>
-                    <h3 class="font-black text-green-700 text-base">Encontrado en sala!</h3>
-                    <p id="sala-found-item" class="text-sm text-gray-600 font-semibold mt-1"></p>
-                    <p id="sala-found-hunter" class="text-[11px] text-gray-400 mt-0.5"></p>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-black text-green-700 text-sm leading-tight">Encontrado en sala</p>
+                        <p id="sala-found-item" class="text-xs text-gray-700 font-semibold mt-0.5 truncate"></p>
+                        <p id="sala-found-hunter" class="text-[10px] text-gray-400 mt-0.5"></p>
+                    </div>
+                    <button type="button" onclick="closeSalaFoundModal()" class="text-gray-300 hover:text-gray-500 text-2xl font-bold leading-none flex-shrink-0">&times;</button>
                 </div>
-                <div id="sala-found-photo-wrap" class="hidden w-full h-56 bg-black rounded-xl overflow-hidden mb-4 border border-green-200">
-                    <img id="sala-found-photo" src="#" alt="Ubicacion en sala" class="w-full h-full object-contain" />
-                </div>
-                <button type="button" onclick="closeSalaFoundModal()" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-green-700 transition">Entendido</button>
+                <!-- Hint tap para ver foto grande (solo si hay foto) -->
+                <p id="sala-found-tap-hint" class="hidden text-[10px] text-gray-400 text-center mb-2">Toca la imagen para verla en grande</p>
+                <button type="button" onclick="closeSalaFoundModal()" class="w-full bg-green-600 text-white font-bold py-2.5 rounded-xl text-sm hover:bg-green-700 transition">Entendido</button>
             </div>
         </div>
 
-        <script src="/js/app.js?v=11" defer></script>
+        <script src="/js/app.js?v=12" defer></script>
     </body>
     </html>
     """

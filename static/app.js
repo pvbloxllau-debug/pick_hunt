@@ -471,24 +471,27 @@
         }
         function previewSalaPhoto(input) {
             if (!input.files || !input.files[0]) return;
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var prev = document.getElementById('sala-photo-preview');
-                var wrap = document.getElementById('sala-photo-preview-container');
-                if (prev) prev.src = e.target.result;
-                if (wrap) wrap.classList.remove('hidden');
-            };
-            reader.readAsDataURL(input.files[0]);
+            // Auto-envio: mostrar estado cargando y disparar submit
+            var btns    = document.getElementById('sala-photo-buttons');
+            var state   = document.getElementById('sala-upload-state');
+            var noBtn   = document.getElementById('sala-no-photo-btn');
+            if (btns)  btns.classList.add('hidden');
+            if (state) state.classList.remove('hidden');
+            if (noBtn) noBtn.classList.add('hidden');
+            submitSalaFound(true);
         }
         function clearSalaPhoto() {
             var c = document.getElementById('sala-camera-only-input');
             var g = document.getElementById('sala-gallery-only-input');
-            var prev = document.getElementById('sala-photo-preview');
-            var wrap = document.getElementById('sala-photo-preview-container');
             if (c) c.value = '';
             if (g) g.value = '';
-            if (prev) prev.src = '#';
-            if (wrap) wrap.classList.add('hidden');
+            // Restablecer estado del modal (en caso de reuso)
+            var btns  = document.getElementById('sala-photo-buttons');
+            var state = document.getElementById('sala-upload-state');
+            var noBtn = document.getElementById('sala-no-photo-btn');
+            if (btns)  btns.classList.remove('hidden');
+            if (state) state.classList.add('hidden');
+            if (noBtn) noBtn.classList.remove('hidden');
         }
         function submitSalaFound(withPhoto) {
             if (!_salaHuntId) return;
@@ -515,31 +518,37 @@
                 })
                 .catch(function(e) {
                     showToast('Error al enviar: ' + e.message, 'red');
-                    if (btn) { btn.disabled = false; btn.textContent = 'Confirmar'; }
+                    clearSalaPhoto(); // restablecer modal para reintentar
                 });
         }
 
         /* --- Sala Found Notification Modal (picker recibe foto) --- */
         function showSalaFoundModal(huntId, item, hunter) {
-            var itemEl   = document.getElementById('sala-found-item');
-            var hunterEl = document.getElementById('sala-found-hunter');
-            var wrap     = document.getElementById('sala-found-photo-wrap');
-            var img      = document.getElementById('sala-found-photo');
-            var modal    = document.getElementById('sala-found-modal');
-            if (itemEl)   itemEl.textContent   = item || '';
-            if (hunterEl) hunterEl.textContent  = 'Hunter: ' + (hunter || '');
-            if (wrap)  wrap.classList.add('hidden');
-            if (modal) modal.classList.remove('hidden');
-            // Cargar foto desde el servidor
-            fetch('/api/hunts/' + huntId + '/location-photo')
-                .then(function(r) { return r.json(); })
-                .then(function(d) {
-                    if (d.photo && img && wrap) {
-                        img.src = d.photo;
-                        wrap.classList.remove('hidden');
-                    }
-                })
-                .catch(function() {});
+            var itemEl    = document.getElementById('sala-found-item');
+            var hunterEl  = document.getElementById('sala-found-hunter');
+            var thumbWrap = document.getElementById('sala-found-thumb-wrap');
+            var img       = document.getElementById('sala-found-photo');
+            var hint      = document.getElementById('sala-found-tap-hint');
+            var modal     = document.getElementById('sala-found-modal');
+            if (itemEl)   itemEl.textContent  = item || '';
+            if (hunterEl) hunterEl.textContent = hunter ? 'Hunter: ' + hunter : '';
+            // Resetear thumbnail
+            if (img)       img.src = '#';
+            if (thumbWrap) thumbWrap.style.background = '#f0fdf4';
+            if (hint)      hint.classList.add('hidden');
+            if (modal)     modal.classList.remove('hidden');
+            // Cargar foto y meter en thumbnail
+            if (huntId) {
+                fetch('/api/hunts/' + huntId + '/location-photo')
+                    .then(function(r) { return r.json(); })
+                    .then(function(d) {
+                        if (d.photo && img) {
+                            img.src = d.photo;
+                            if (hint) hint.classList.remove('hidden');
+                        }
+                    })
+                    .catch(function() {});
+            }
         }
         function closeSalaFoundModal() {
             var modal = document.getElementById('sala-found-modal');
