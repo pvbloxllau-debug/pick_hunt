@@ -752,7 +752,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=16" defer></script>
+        <script src="/js/app.js?v=17" defer></script>
     </body>
     </html>
     """
@@ -1575,8 +1575,8 @@ def _build_historial_html(hist_rows: list) -> str:
                 check_btn = (
                     f"<button onclick=\"pickerConfirm({h['id']})\""
                     f" style='flex-shrink:0;width:34px;height:34px;border-radius:50%;border:2px solid #16a34a;"
-                    f"background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;'"
-                    f" title='Confirmar retiro'>"
+                    f"background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;"
+                    f"animation:pulse 1.5s infinite;' title='Confirmar retiro'>"
                     f"<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='#16a34a' stroke-width='3'>"
                     f"<path stroke-linecap='round' stroke-linejoin='round' d='M5 13l4 4L19 7'/></svg>"
                     f"</button>"
