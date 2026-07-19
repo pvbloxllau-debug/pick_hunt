@@ -85,6 +85,7 @@ def init_db():
         ("resolved_at",      "TIMESTAMP"),
         ("found_location",   "TEXT"),  # 'sala' | 'bodega' | NULL
         ("protocolo_at",     "TIMESTAMP"),  # cuando el picker aplico protocolo
+        ("location_photo",   "TEXT"),  # foto del hunter al encontrar en sala
     ]:
         try:
             cursor.execute(f"ALTER TABLE hunts ADD COLUMN {_col} {_def}")
@@ -637,7 +638,59 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
 
         {BOTTOM_NAV}
 
-        <script src="/js/app.js?v=10" defer></script>
+        <!-- Modal: En Sala con Foto (hunter) -->
+        <div id="sala-photo-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hidden">
+            <div class="bg-white rounded-2xl p-5 mx-4 w-full max-w-sm shadow-2xl">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-black text-lg text-green-700">En Sala</h3>
+                    <button type="button" onclick="closeSalaPhotoModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold leading-none">&times;</button>
+                </div>
+                <p id="sala-photo-item-name" class="text-sm text-gray-600 mb-4 font-semibold"></p>
+                <div id="sala-photo-buttons" class="flex gap-3 mb-3">
+                    <button type="button" onclick="triggerCamera('sala-')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-3 rounded-xl flex flex-col items-center gap-1 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        Camara
+                    </button>
+                    <button type="button" onclick="triggerGallery('sala-')" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold py-3 rounded-xl flex flex-col items-center gap-1 transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        Galeria
+                    </button>
+                </div>
+                <input id="sala-camera-only-input" type="file" accept="image/*" capture="environment" class="hidden" onchange="previewSalaPhoto(this)" />
+                <input id="sala-gallery-only-input" type="file" accept="image/*" class="hidden" onchange="previewSalaPhoto(this)" />
+                <div id="sala-photo-preview-container" class="hidden relative w-full h-44 bg-black rounded-xl overflow-hidden mb-3 border border-gray-200">
+                    <img id="sala-photo-preview" src="#" alt="Preview" class="w-full h-full object-contain" />
+                    <button type="button" onclick="clearSalaPhoto()" class="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-full shadow hover:bg-red-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-400 text-center mb-4">Foto opcional - ayuda al picker a encontrarlo rapido</p>
+                <div class="flex gap-3">
+                    <button type="button" onclick="submitSalaFound(false)" class="flex-1 bg-gray-100 text-gray-600 font-bold py-3 rounded-xl text-sm hover:bg-gray-200 transition">Sin foto</button>
+                    <button type="button" onclick="submitSalaFound(true)" id="sala-confirm-btn" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-green-700 transition">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Notificacion foto ubicacion (picker) -->
+        <div id="sala-found-modal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center hidden">
+            <div class="bg-white rounded-2xl p-5 mx-4 w-full max-w-sm shadow-2xl">
+                <div class="text-center mb-3">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                    <h3 class="font-black text-green-700 text-base">Encontrado en sala!</h3>
+                    <p id="sala-found-item" class="text-sm text-gray-600 font-semibold mt-1"></p>
+                    <p id="sala-found-hunter" class="text-[11px] text-gray-400 mt-0.5"></p>
+                </div>
+                <div id="sala-found-photo-wrap" class="hidden w-full h-56 bg-black rounded-xl overflow-hidden mb-4 border border-green-200">
+                    <img id="sala-found-photo" src="#" alt="Ubicacion en sala" class="w-full h-full object-contain" />
+                </div>
+                <button type="button" onclick="closeSalaFoundModal()" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-green-700 transition">Entendido</button>
+            </div>
+        </div>
+
+        <script src="/js/app.js?v=11" defer></script>
     </body>
     </html>
     """
@@ -1441,6 +1494,15 @@ def _build_historial_html(hist_rows: list) -> str:
             sign = '+' if h['inventory_delta'] >= 0 else ''
             delta_line = (f"<span style='font-size:10px;color:#0f766e;font-weight:700;'>"
                           f"{sign}{h['inventory_delta']} un.</span>")
+        # Thumbnail foto de ubicacion (solo si encontrado en sala con foto)
+        loc_photo = h['location_photo'] if 'location_photo' in h.keys() else None
+        photo_thumb = ''
+        if h['status'] == 'Encontrado' and loc_photo:
+            photo_thumb = (
+                f"<img src='{loc_photo}' onclick=\"showPhotoLightBox('{loc_photo}')\""
+                f" style='width:38px;height:38px;object-fit:cover;border-radius:8px;"
+                f"border:2px solid #16a34a;cursor:zoom-in;flex-shrink:0;' title='Ver foto de ubicacion' />"
+            )
         hist_cards += f"""
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;
                     padding:10px 12px;background:white;border-radius:10px;border:1px solid #e5e7eb;">
@@ -1453,6 +1515,7 @@ def _build_historial_html(hist_rows: list) -> str:
                     {delta_line}
                 </div>
             </div>
+            {photo_thumb}
             <span style="flex-shrink:0;{sty}font-size:9px;font-weight:900;
                          padding:3px 8px;border-radius:999px;white-space:nowrap;">{label}</span>
         </div>"""
@@ -1589,11 +1652,9 @@ def _build_hunts_html(user: dict, search: str = "") -> str:
             if can_hunt and is_assigned_to_me:
                 actions = f"""
                 <div style="display:flex;gap:6px;width:100%;">
-                    <button hx-post="/api/hunts/{hunt['id']}/found"
-                            hx-target="#hunts-container"
-                            hx-vals='{{"found_location":"sala"}}'
+                    <button onclick="openSalaPhotoModal({hunt['id']}, '{item_name_safe}')"
                             style="background:#2a8703;color:white;font-size:10px;font-weight:700;padding:8px 6px;border-radius:8px;border:none;cursor:pointer;flex:1;text-align:center;line-height:1.2;">
-                        En sala
+                         En sala
                     </button>
                     <button hx-post="/api/hunts/{hunt['id']}/found"
                             hx-target="#hunts-container"
@@ -1885,6 +1946,8 @@ async def api_found_hunt(
     request: Request,
     hunt_id: int,
     found_location: str = Form("sala"),  # 'sala' | 'bodega'
+    photo_camera: UploadFile = File(None),
+    photo_gallery: UploadFile = File(None),
 ):
     user = get_current_user(request)
     if not user:
@@ -1896,13 +1959,24 @@ async def api_found_hunt(
     loc_label = 'en sala (góndola)' if loc == 'sala' else 'en bodega'
     loc_emoji = '' if loc == 'sala' else ''
 
+    # Procesar foto de ubicacion (solo para sala)
+    location_photo_b64 = None
+    if loc == 'sala':
+        photo_file = photo_camera if (photo_camera and photo_camera.filename) else photo_gallery
+        if photo_file and photo_file.filename:
+            file_bytes = await photo_file.read()
+            if file_bytes:
+                encoded = base64.b64encode(file_bytes).decode('utf-8')
+                content_type = photo_file.content_type or 'image/jpeg'
+                location_photo_b64 = f"data:{content_type};base64,{encoded}"
+
     conn = get_db()
     cursor = conn.cursor()
     hunt = cursor.execute("SELECT * FROM hunts WHERE id=?", (hunt_id,)).fetchone()
     if hunt:
         cursor.execute(
-            "UPDATE hunts SET status='Encontrado', found_location=?, resolved_at=CURRENT_TIMESTAMP WHERE id=?",
-            (loc, hunt_id),
+            "UPDATE hunts SET status='Encontrado', found_location=?, resolved_at=CURRENT_TIMESTAMP, location_photo=? WHERE id=?",
+            (loc, location_photo_b64, hunt_id),
         )
         cursor.execute(
             "UPDATE users SET points=points+50, hunts_completed=hunts_completed+1 WHERE id=?",
@@ -1924,15 +1998,35 @@ async def api_found_hunt(
     await manager.broadcast("refresh")
 
     if hunt and reporter_username:
-        toast_color = 'amber' if loc == 'sala' else 'green'
-        toast_msg   = (
-            f" '{hunt['item_name']}' estaba en sala — fue reportado innecesariamente."
-            if loc == 'sala'
-            else f" '{hunt['item_name']}' encontrado en bodega por {user['full_name']}."
-        )
-        await manager.notify_user(reporter_username, f"toast:{toast_color}|{toast_msg}")
+        if loc == 'sala' and location_photo_b64:
+            # Notificacion especial con foto al picker
+            await manager.notify_user(
+                reporter_username,
+                f"sala-photo:{hunt_id}|{hunt['item_name']}|{user['full_name']}"
+            )
+        else:
+            toast_color = 'amber' if loc == 'sala' else 'green'
+            toast_msg   = (
+                f" '{hunt['item_name']}' estaba en sala — fue reportado innecesariamente."
+                if loc == 'sala'
+                else f" '{hunt['item_name']}' encontrado en bodega por {user['full_name']}."
+            )
+            await manager.notify_user(reporter_username, f"toast:{toast_color}|{toast_msg}")
 
     return api_hunts_list(request)
+
+
+@app.get("/api/hunts/{hunt_id}/location-photo")
+def api_get_location_photo(request: Request, hunt_id: int):
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=403, detail="Not logged in")
+    conn = get_db()
+    row = conn.execute("SELECT location_photo FROM hunts WHERE id=?", (hunt_id,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Hunt no encontrado")
+    return {"photo": row["location_photo"]}
 
 
 class BannerPayload(BaseModel):

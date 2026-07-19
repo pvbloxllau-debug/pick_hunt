@@ -445,13 +445,105 @@
             if (!input.files || !input.files[0]) return;
             var reader = new FileReader();
             var prev = document.getElementById(prefix + 'photo-preview');
+            var wrap = document.getElementById(prefix + 'photo-preview-container');
             reader.onload = function(e) {
-                if (prev) {
-                    prev.src = e.target.result;
-                    prev.classList.remove('hidden');
-                }
+                if (prev) { prev.src = e.target.result; prev.classList.remove('hidden'); }
+                if (wrap) wrap.classList.remove('hidden');
             };
             reader.readAsDataURL(input.files[0]);
+        }
+
+        /* --- Sala Photo Modal (hunter: En sala con foto) --- */
+        var _salaHuntId = null;
+        function openSalaPhotoModal(huntId, itemName) {
+            _salaHuntId = huntId;
+            var nameEl = document.getElementById('sala-photo-item-name');
+            if (nameEl) nameEl.textContent = itemName || '';
+            clearSalaPhoto();
+            var modal = document.getElementById('sala-photo-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+        function closeSalaPhotoModal() {
+            var modal = document.getElementById('sala-photo-modal');
+            if (modal) modal.classList.add('hidden');
+            clearSalaPhoto();
+            _salaHuntId = null;
+        }
+        function previewSalaPhoto(input) {
+            if (!input.files || !input.files[0]) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var prev = document.getElementById('sala-photo-preview');
+                var wrap = document.getElementById('sala-photo-preview-container');
+                if (prev) prev.src = e.target.result;
+                if (wrap) wrap.classList.remove('hidden');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+        function clearSalaPhoto() {
+            var c = document.getElementById('sala-camera-only-input');
+            var g = document.getElementById('sala-gallery-only-input');
+            var prev = document.getElementById('sala-photo-preview');
+            var wrap = document.getElementById('sala-photo-preview-container');
+            if (c) c.value = '';
+            if (g) g.value = '';
+            if (prev) prev.src = '#';
+            if (wrap) wrap.classList.add('hidden');
+        }
+        function submitSalaFound(withPhoto) {
+            if (!_salaHuntId) return;
+            var btn = document.getElementById('sala-confirm-btn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+            var formData = new FormData();
+            formData.append('found_location', 'sala');
+            if (withPhoto) {
+                var camInput = document.getElementById('sala-camera-only-input');
+                var galInput = document.getElementById('sala-gallery-only-input');
+                var photoFile = (camInput && camInput.files && camInput.files[0])
+                    ? camInput.files[0]
+                    : (galInput && galInput.files && galInput.files[0] ? galInput.files[0] : null);
+                if (photoFile) formData.append('photo_camera', photoFile);
+            }
+            fetch('/api/hunts/' + _salaHuntId + '/found', { method: 'POST', body: formData })
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    var c = document.getElementById('hunts-container');
+                    if (c) { c.innerHTML = html; if (typeof htmx !== 'undefined') htmx.process(c); tickTimers(); }
+                    closeSalaPhotoModal();
+                    var fc = document.getElementById('feed-container');
+                    if (fc && typeof htmx !== 'undefined') htmx.trigger(fc, 'reload-feed');
+                })
+                .catch(function(e) {
+                    showToast('Error al enviar: ' + e.message, 'red');
+                    if (btn) { btn.disabled = false; btn.textContent = 'Confirmar'; }
+                });
+        }
+
+        /* --- Sala Found Notification Modal (picker recibe foto) --- */
+        function showSalaFoundModal(huntId, item, hunter) {
+            var itemEl   = document.getElementById('sala-found-item');
+            var hunterEl = document.getElementById('sala-found-hunter');
+            var wrap     = document.getElementById('sala-found-photo-wrap');
+            var img      = document.getElementById('sala-found-photo');
+            var modal    = document.getElementById('sala-found-modal');
+            if (itemEl)   itemEl.textContent   = item || '';
+            if (hunterEl) hunterEl.textContent  = 'Hunter: ' + (hunter || '');
+            if (wrap)  wrap.classList.add('hidden');
+            if (modal) modal.classList.remove('hidden');
+            // Cargar foto desde el servidor
+            fetch('/api/hunts/' + huntId + '/location-photo')
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    if (d.photo && img && wrap) {
+                        img.src = d.photo;
+                        wrap.classList.remove('hidden');
+                    }
+                })
+                .catch(function() {});
+        }
+        function closeSalaFoundModal() {
+            var modal = document.getElementById('sala-found-modal');
+            if (modal) modal.classList.add('hidden');
         }
 
         /* --- Photo lightbox --- */
@@ -588,6 +680,16 @@
                 var qty   = wh[2] || '';
                 if (typeof showToast === 'function')
                     showToast('Nueva alerta: ' + item3 + ' (' + qty + ' un.)', 'orange');
+                return;
+            }
+
+            /* sala-photo:huntId|item|hunter */
+            if (data.indexOf('sala-photo:') === 0) {
+                var sp = data.slice(11).split('|');
+                var spHuntId = sp[0] || '';
+                var spItem   = sp[1] || '';
+                var spHunter = sp[2] || '';
+                if (typeof showSalaFoundModal === 'function') showSalaFoundModal(spHuntId, spItem, spHunter);
                 return;
             }
 
