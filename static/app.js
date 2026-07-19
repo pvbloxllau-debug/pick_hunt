@@ -156,7 +156,6 @@
                 yellow: 'background:#ca8a04;'
             };
             var bg = colors[color] || colors.green;
-            /* Calcular offset vertical segun cuantos toasts ya existen */
             var existing = document.querySelectorAll('.app-toast');
             var offset = 16 + existing.length * 68;
             var t = document.createElement('div');
@@ -165,6 +164,36 @@
             t.textContent = msg;
             document.body.appendChild(t);
             setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 3500);
+        }
+
+        /* Toast pulsante para broadcasts (supervisor/hunter) - persiste 8 seg */
+        function showPulseToast(msg, color) {
+            var colors = {
+                green:  'background:#15803d;',
+                red:    'background:#dc2626;',
+                orange: 'background:#ea580c;',
+                blue:   'background:#1d4ed8;',
+                yellow: 'background:#ca8a04;'
+            };
+            var bg = colors[color] || colors.blue;
+            var existing = document.querySelectorAll('.app-toast');
+            var offset = 16 + existing.length * 68;
+            var t = document.createElement('div');
+            t.className = 'app-toast';
+            /* slide-in, luego cambia a pulse */
+            t.style.cssText = 'position:fixed;top:' + offset + 'px;right:16px;' + bg +
+                'color:white;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:700;' +
+                'z-index:99999;max-width:300px;text-align:left;box-shadow:0 6px 20px rgba(0,0,0,.3);' +
+                'animation:slideInRight .2s ease;line-height:1.4;cursor:pointer;';
+            t.textContent = msg;
+            t.onclick = function() { if (t.parentNode) t.parentNode.removeChild(t); };
+            document.body.appendChild(t);
+            /* tras slide-in, activar pulse */
+            setTimeout(function() {
+                if (t.parentNode) t.style.animation = 'pulse 1.5s infinite';
+            }, 250);
+            /* auto-remove a los 8 seg */
+            setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 8000);
         }
 
         /* --- Report Modal --- */
@@ -745,7 +774,7 @@
             /* broadcast-banner:mensaje */
             if (data.indexOf('broadcast-banner:') === 0) {
                 var msg2 = data.slice(17);
-                if (typeof showToast === 'function') showToast(msg2, 'blue');
+                if (typeof showPulseToast === 'function') showPulseToast(msg2, 'blue');
                 return;
             }
 
@@ -753,7 +782,7 @@
             if (data.indexOf('broadcast-hunter:') === 0) {
                 var bh = data.slice(17).split('|');
                 var msg3 = bh.slice(1).join('|') || bh[0];
-                if (typeof showToast === 'function') showToast(msg3, 'blue');
+                if (typeof showPulseToast === 'function') showPulseToast(msg3, 'orange');
                 return;
             }
 
@@ -762,8 +791,8 @@
                 var wh = data.slice(12).split('|');
                 var item3 = wh[1] || '';
                 var qty   = wh[2] || '';
-                if (typeof showToast === 'function')
-                    showToast('Nueva alerta: ' + item3 + ' (' + qty + ' un.)', 'orange');
+                if (typeof showPulseToast === 'function')
+                    showPulseToast('Nueva alerta: ' + item3 + ' (' + qty + ' un.)', 'orange');
                 return;
             }
 
