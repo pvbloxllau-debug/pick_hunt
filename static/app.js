@@ -530,7 +530,7 @@
 
         var NOTIF_STYLES = {
             sala:   { bg: '#15803d', label: 'PRODUCTO EN SALA',   verBtn: '#15803d' },
-            bodega: { bg: '#1d4ed8', label: 'PRODUCTO EN BODEGA', verBtn: '#1d4ed8' }
+            bodega: { bg: '#1d4ed8', label: 'DISPONIBLE EN CARRO NARANJA', verBtn: '#1d4ed8' }
         };
 
         function showFoundNotif(type, huntId, item, hunter) {

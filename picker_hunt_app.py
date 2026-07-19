@@ -751,7 +751,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=14" defer></script>
+        <script src="/js/app.js?v=15" defer></script>
     </body>
     </html>
     """
