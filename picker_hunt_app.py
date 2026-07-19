@@ -1624,6 +1624,7 @@ def _build_hunts_html(user: dict, search: str = "") -> str:
         is_assigned_to_me = hunt['assigned_to'] == user['full_name']
 
         # ── Role-based actions ──────────────────────────────────────────────
+        item_name_safe = hunt['item_name'].replace("'", "\\'")
         actions = ""
         if status == 'Buscando':
             if can_hunt:
@@ -1675,7 +1676,6 @@ def _build_hunts_html(user: dict, search: str = "") -> str:
                     actions = f"<span class='text-[10px] text-gray-400 italic text-right block w-full'>Asignado a {hunt['assigned_to']}</span>"
         
         is_active = status in ('Buscando', 'Yendo', 'Protocolo')
-        item_name_safe = hunt['item_name'].replace("'", "\\'")
 
         # Unix epoch entero - timezone-agnostic, el JS usa Date.now() que tambien es UTC ms
         import calendar
