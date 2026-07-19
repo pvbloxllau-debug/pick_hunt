@@ -669,32 +669,37 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
         </div>
 
         <!-- Banner notificacion (picker): desliza desde arriba, no bloquea pantalla -->
-        <div id="sala-notif-banner"
+        <!-- Banner generico: sala (verde) o bodega (azul) - desliza desde arriba -->
+        <div id="found-notif-banner"
              style="position:fixed;top:0;left:0;right:0;z-index:9998;
                     transform:translateY(-110%);transition:transform .35s cubic-bezier(.2,.8,.4,1);
                     padding:env(safe-area-inset-top,0) 0 0;pointer-events:auto;">
-            <div style="background:#15803d;color:white;padding:12px 14px;
+            <div id="found-notif-inner"
+                 style="background:#15803d;color:white;padding:12px 14px;
                         display:flex;align-items:center;gap:10px;
                         box-shadow:0 4px 24px rgba(0,0,0,.3);">
-                <!-- Icono ubicacion -->
+                <!-- Icono intercambiable segun tipo -->
                 <div style="flex-shrink:0;width:38px;height:38px;background:rgba(255,255,255,.18);
                             border-radius:10px;display:flex;align-items:center;justify-content:center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <!-- sala: pin ubicacion -->
+                    <svg id="found-notif-icon-sala" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <!-- bodega: caja -->
+                    <svg id="found-notif-icon-bodega" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                 </div>
                 <!-- Texto -->
                 <div style="flex:1;min-width:0;">
-                    <p style="font-size:10px;font-weight:900;margin:0;letter-spacing:.04em;opacity:.85;">PRODUCTO EN SALA</p>
-                    <p id="sala-notif-item" style="font-size:13px;font-weight:900;margin:1px 0 0;
+                    <p id="found-notif-label" style="font-size:10px;font-weight:900;margin:0;letter-spacing:.04em;opacity:.85;">PRODUCTO EN SALA</p>
+                    <p id="found-notif-item" style="font-size:13px;font-weight:900;margin:1px 0 0;
                         overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></p>
-                    <p id="sala-notif-hunter" style="font-size:10px;margin:1px 0 0;opacity:.75;"></p>
+                    <p id="found-notif-hunter" style="font-size:10px;margin:1px 0 0;opacity:.75;"></p>
                 </div>
-                <!-- Boton ver foto (aparece cuando foto esta lista) -->
-                <button id="sala-notif-ver-btn" onclick="openSalaPhotoSheet()"
+                <!-- Boton ver foto (solo sala, cuando foto lista) -->
+                <button id="found-notif-ver-btn" onclick="openSalaPhotoSheet()"
                         style="background:white;color:#15803d;border:none;border-radius:8px;
                                padding:7px 13px;font-size:11px;font-weight:900;cursor:pointer;
                                white-space:nowrap;flex-shrink:0;display:none;">Ver foto</button>
                 <!-- Cerrar -->
-                <button onclick="closeSalaNotif()"
+                <button onclick="closeFoundNotif()"
                         style="background:none;border:none;color:rgba(255,255,255,.6);
                                font-size:22px;font-weight:900;cursor:pointer;
                                padding:0 0 0 2px;line-height:1;flex-shrink:0;">&times;</button>
@@ -746,7 +751,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=13" defer></script>
+        <script src="/js/app.js?v=14" defer></script>
     </body>
     </html>
     """
@@ -2055,19 +2060,23 @@ async def api_found_hunt(
 
     if hunt and reporter_username:
         if loc == 'sala' and location_photo_b64:
-            # Notificacion especial con foto al picker
+            # Notificacion sala con foto
+            await manager.notify_user(
+                reporter_username,
+                f"sala-photo:{hunt_id}|{hunt['item_name']}|{user['full_name']}"
+            )
+        elif loc == 'sala':
+            # Sala sin foto — banner generico sala
             await manager.notify_user(
                 reporter_username,
                 f"sala-photo:{hunt_id}|{hunt['item_name']}|{user['full_name']}"
             )
         else:
-            toast_color = 'amber' if loc == 'sala' else 'green'
-            toast_msg   = (
-                f" '{hunt['item_name']}' estaba en sala — fue reportado innecesariamente."
-                if loc == 'sala'
-                else f" '{hunt['item_name']}' encontrado en bodega por {user['full_name']}."
+            # Bodega — banner generico bodega
+            await manager.notify_user(
+                reporter_username,
+                f"bodega-found:{hunt_id}|{hunt['item_name']}|{user['full_name']}"
             )
-            await manager.notify_user(reporter_username, f"toast:{toast_color}|{toast_msg}")
 
     return api_hunts_list(request)
 

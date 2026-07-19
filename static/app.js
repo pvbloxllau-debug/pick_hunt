@@ -522,41 +522,55 @@
                 });
         }
 
-        /* --- Sala Notif Banner + Photo Sheet (picker recibe notificacion de producto en sala) --- */
-        var _salaNotifTimer = null;
-        var _salaNotifPhotoUrl = null;
-        var _salaNotifItem = '';
-        var _salaNotifHunter = '';
+        /* --- Found Notif Banner: sala (verde) y bodega (azul) --- */
+        var _foundNotifTimer  = null;
+        var _foundNotifPhoto  = null;  // URL foto sala
+        var _foundNotifItem   = '';
+        var _foundNotifHunter = '';
 
-        function showSalaFoundModal(huntId, item, hunter) {
-            // Alias para compatibilidad con WS handler existente
-            _salaNotifItem   = item || '';
-            _salaNotifHunter = hunter || '';
-            _salaNotifPhotoUrl = null;
+        var NOTIF_STYLES = {
+            sala:   { bg: '#15803d', label: 'PRODUCTO EN SALA',   verBtn: '#15803d' },
+            bodega: { bg: '#1d4ed8', label: 'PRODUCTO EN BODEGA', verBtn: '#1d4ed8' }
+        };
 
-            var notifItem    = document.getElementById('sala-notif-item');
-            var notifHunter  = document.getElementById('sala-notif-hunter');
-            var verBtn       = document.getElementById('sala-notif-ver-btn');
-            var banner       = document.getElementById('sala-notif-banner');
-            if (notifItem)   notifItem.textContent   = item || '';
-            if (notifHunter) notifHunter.textContent = hunter ? 'Hunter: ' + hunter : '';
-            if (verBtn)      verBtn.style.display = 'none'; // ocultar hasta tener foto
+        function showFoundNotif(type, huntId, item, hunter) {
+            _foundNotifItem   = item   || '';
+            _foundNotifHunter = hunter || '';
+            _foundNotifPhoto  = null;
 
-            // Mostrar banner (desliza hacia abajo)
+            var style   = NOTIF_STYLES[type] || NOTIF_STYLES.sala;
+            var banner  = document.getElementById('found-notif-banner');
+            var inner   = document.getElementById('found-notif-inner');
+            var label   = document.getElementById('found-notif-label');
+            var itemEl  = document.getElementById('found-notif-item');
+            var hunterEl= document.getElementById('found-notif-hunter');
+            var verBtn  = document.getElementById('found-notif-ver-btn');
+            var iconSala  = document.getElementById('found-notif-icon-sala');
+            var iconBodega= document.getElementById('found-notif-icon-bodega');
+
+            if (inner)    inner.style.background    = style.bg;
+            if (label)    label.textContent         = style.label;
+            if (itemEl)   itemEl.textContent        = item   || '';
+            if (hunterEl) hunterEl.textContent      = hunter ? 'Hunter: ' + hunter : '';
+            if (verBtn)   { verBtn.style.display = 'none'; verBtn.style.color = style.verBtn; }
+            // Iconos
+            if (iconSala)   iconSala.style.display   = type === 'sala'   ? 'block' : 'none';
+            if (iconBodega) iconBodega.style.display  = type === 'bodega' ? 'block' : 'none';
+
+            // Mostrar banner
             if (banner) banner.style.transform = 'translateY(0)';
 
             // Auto-cierre 20 seg
-            if (_salaNotifTimer) clearTimeout(_salaNotifTimer);
-            _salaNotifTimer = setTimeout(closeSalaNotif, 20000);
+            if (_foundNotifTimer) clearTimeout(_foundNotifTimer);
+            _foundNotifTimer = setTimeout(closeFoundNotif, 20000);
 
-            // Cargar foto en background
-            if (huntId) {
+            // Si es sala, cargar foto en background
+            if (type === 'sala' && huntId) {
                 fetch('/api/hunts/' + huntId + '/location-photo')
                     .then(function(r) { return r.json(); })
                     .then(function(d) {
                         if (d.photo) {
-                            _salaNotifPhotoUrl = d.photo;
-                            // Mostrar boton "Ver foto" ahora que la tenemos
+                            _foundNotifPhoto = d.photo;
                             if (verBtn) verBtn.style.display = 'block';
                         }
                     })
@@ -564,39 +578,33 @@
             }
         }
 
-        function closeSalaNotif() {
-            if (_salaNotifTimer) { clearTimeout(_salaNotifTimer); _salaNotifTimer = null; }
-            var banner = document.getElementById('sala-notif-banner');
+        function closeFoundNotif() {
+            if (_foundNotifTimer) { clearTimeout(_foundNotifTimer); _foundNotifTimer = null; }
+            var banner = document.getElementById('found-notif-banner');
             if (banner) banner.style.transform = 'translateY(-110%)';
         }
 
+        /* Aliases para backward compat con WS handler y funciones existentes */
+        function closeSalaNotif()  { closeFoundNotif(); }
+        function showSalaFoundModal(huntId, item, hunter) { showFoundNotif('sala', huntId, item, hunter); }
+        function closeSalaFoundModal() { closeFoundNotif(); closeSalaPhotoSheet(); }
+
         function openSalaPhotoSheet() {
-            closeSalaNotif();
-            var overlay  = document.getElementById('sala-photo-sheet-overlay');
-            var sheet    = document.getElementById('sala-photo-sheet');
+            closeFoundNotif();
+            var overlay      = document.getElementById('sala-photo-sheet-overlay');
+            var sheet        = document.getElementById('sala-photo-sheet');
             var sheetItem    = document.getElementById('sala-sheet-item');
             var sheetHunter  = document.getElementById('sala-sheet-hunter');
             var sheetPhoto   = document.getElementById('sala-sheet-photo');
             var sheetLoading = document.getElementById('sala-sheet-loading');
-
-            if (sheetItem)   sheetItem.textContent   = _salaNotifItem;
-            if (sheetHunter) sheetHunter.textContent = _salaNotifHunter ? 'Hunter: ' + _salaNotifHunter : '';
-
-            // Resetear imagen
+            if (sheetItem)   sheetItem.textContent   = _foundNotifItem;
+            if (sheetHunter) sheetHunter.textContent = _foundNotifHunter ? 'Hunter: ' + _foundNotifHunter : '';
             if (sheetPhoto)   { sheetPhoto.src = '#'; sheetPhoto.style.display = 'none'; }
             if (sheetLoading) sheetLoading.style.display = 'flex';
-
-            // Animar apertura
             if (overlay) { overlay.style.pointerEvents = 'auto'; overlay.style.background = 'rgba(0,0,0,.6)'; }
             if (sheet)   sheet.style.transform = 'translateY(0)';
-
-            // Cargar foto si la tenemos
-            if (_salaNotifPhotoUrl && sheetPhoto) {
-                sheetPhoto.src = _salaNotifPhotoUrl;
-                // onload del img se encarga de mostrarla y ocultar loading
-            }
+            if (_foundNotifPhoto && sheetPhoto) sheetPhoto.src = _foundNotifPhoto;
         }
-
         function closeSalaPhotoSheet() {
             var overlay = document.getElementById('sala-photo-sheet-overlay');
             var sheet   = document.getElementById('sala-photo-sheet');
@@ -606,8 +614,6 @@
                 setTimeout(function() { overlay.style.pointerEvents = 'none'; }, 350);
             }
         }
-
-        function closeSalaFoundModal() { closeSalaNotif(); closeSalaPhotoSheet(); }
 
         /* --- Photo lightbox --- */
         function showPhotoLightBox(src) {
@@ -752,7 +758,17 @@
                 var spHuntId = sp[0] || '';
                 var spItem   = sp[1] || '';
                 var spHunter = sp[2] || '';
-                if (typeof showSalaFoundModal === 'function') showSalaFoundModal(spHuntId, spItem, spHunter);
+                if (typeof showFoundNotif === 'function') showFoundNotif('sala', spHuntId, spItem, spHunter);
+                return;
+            }
+
+            /* bodega-found:huntId|item|hunter */
+            if (data.indexOf('bodega-found:') === 0) {
+                var bf = data.slice(13).split('|');
+                var bfHuntId = bf[0] || '';
+                var bfItem   = bf[1] || '';
+                var bfHunter = bf[2] || '';
+                if (typeof showFoundNotif === 'function') showFoundNotif('bodega', bfHuntId, bfItem, bfHunter);
                 return;
             }
 
