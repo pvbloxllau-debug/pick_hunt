@@ -513,9 +513,11 @@
             var c = document.getElementById(prefix + 'camera-only-input');
             var g = document.getElementById(prefix + 'gallery-only-input');
             var prev = document.getElementById(prefix + 'photo-preview');
+            var wrap = document.getElementById(prefix + 'photo-preview-container');
             if (c) c.value = '';
             if (g) g.value = '';
-            if (prev) prev.classList.add('hidden');
+            if (prev) prev.src = '#';
+            if (wrap) { wrap.classList.add('hidden'); wrap.style.display = ''; }
         }
         function previewPhotoSelected(input, prefix) {
             prefix = prefix || '';
@@ -524,8 +526,8 @@
             var prev = document.getElementById(prefix + 'photo-preview');
             var wrap = document.getElementById(prefix + 'photo-preview-container');
             reader.onload = function(e) {
-                if (prev) { prev.src = e.target.result; prev.classList.remove('hidden'); }
-                if (wrap) wrap.classList.remove('hidden');
+                if (prev) { prev.src = e.target.result; }
+                if (wrap) { wrap.classList.remove('hidden'); wrap.style.display = 'flex'; }
             };
             reader.readAsDataURL(input.files[0]);
         }

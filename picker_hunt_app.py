@@ -686,7 +686,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                     <div id="photo-preview-container" class="hidden"
                          style="position:relative;width:100%;max-height:80px;
                                 background:#000;border-radius:10px;overflow:hidden;
-                                border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;">
+                                border:1px solid #e5e7eb;align-items:center;justify-content:center;">
                         <img id="photo-preview" src="#" alt="Preview"
                              style="max-width:100%;max-height:80px;object-fit:contain;" />
                         <button type="button" onclick="clearPhotoInputs(event)"
@@ -1130,7 +1130,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=22" defer></script>
+        <script src="/js/app.js?v=23" defer></script>
     </body>
     </html>
     """
