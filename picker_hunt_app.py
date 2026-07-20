@@ -510,13 +510,233 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
         <!-- MODAL: REPORTAR FALTANTE -->
         <div id="mobile-report-modal"
              style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;
-                    align-items:flex-end;justify-content:center;"
+                    align-items:flex-end;justify-content:center;
+                    padding-bottom:env(safe-area-inset-bottom,0);"
              class="hidden opacity-0 transition-opacity duration-300">
-            <div style="background:#fff;width:100%;max-width:480px;
-                        border-radius:24px 24px 0 0;padding:0;
-                        max-height:92vh;overflow-y:auto;
-                        box-shadow:0 -8px 40px rgba(0,0,0,.18);"
+            <div id="report-modal-sheet"
+                 style="background:#fff;width:100%;max-width:480px;
+                        border-radius:20px 20px 0 0;padding:0;
+                        max-height:62dvh;max-height:62vh;
+                        display:flex;flex-direction:column;
+                        box-shadow:0 -8px 40px rgba(0,0,0,.18);
+                        overscroll-behavior:contain;"
                  class="transform translate-y-full transition-transform duration-300">
+
+                <!-- Handle + Header (fijo, no scrollea) -->
+                <div style="flex-shrink:0;padding:8px 16px 0;">
+                    <div style="width:32px;height:3px;background:#e5e7eb;border-radius:2px;margin:0 auto 8px;"></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;
+                                padding-bottom:8px;border-bottom:1px solid #f3f4f6;">
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="width:7px;height:7px;border-radius:50%;background:#d13438;
+                                         animation:pulse 1.5s infinite;flex-shrink:0;"></span>
+                            <h3 style="font-size:13px;font-weight:800;color:#111827;margin:0;">Reportar Faltante</h3>
+                        </div>
+                        <button onclick="closeReportModal()"
+                                style="background:#f9fafb;border:none;border-radius:8px;
+                                       width:28px;height:28px;cursor:pointer;
+                                       display:flex;align-items:center;justify-content:center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                                 viewBox="0 0 24 24" stroke="#6b7280" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FORM (scrolleable) -->
+                <form id="mobile-report-form" action="/api/hunts" method="post"
+                      enctype="multipart/form-data"
+                      style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+                             padding:10px 16px 16px;display:flex;flex-direction:column;gap:8px;"
+                      onsubmit="return submitReportModal(event)">
+
+                    <!-- ITEM / CODIGO -->
+                    <div>
+                        <label style="display:block;font-size:9.5px;font-weight:700;color:#6b7280;
+                                      text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Codigo / Item</label>
+                        <div id="barcode-wrap"
+                             style="display:flex;align-items:center;gap:8px;
+                                    border:1.5px solid #e5e7eb;border-radius:10px;
+                                    background:#f9fafb;padding:0 10px;
+                                    transition:border-color .2s,box-shadow .2s,background .2s;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none"
+                                 viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2" style="flex-shrink:0;">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01
+                                       M16 20h4M4 12h4m12 0h.01M5 8H2a2 2 0 00-2 2v4a2 2 0 002 2h3
+                                       m14-8h2a2 2 0 012 2v4a2 2 0 01-2 2h-3
+                                       M9 20H5a2 2 0 01-2-2v-4a2 2 0 012-2h4"/>
+                            </svg>
+                            <input type="text" name="barcode" required placeholder="Ej: 7802100004567"
+                                   style="flex:1;border:none;outline:none;background:transparent;
+                                          padding:7px 0;font-size:12px;color:#111827;min-width:0;"
+                                   onfocus="var w=document.getElementById('barcode-wrap');
+                                            w.style.borderColor='#d13438';
+                                            w.style.boxShadow='0 0 0 3px rgba(209,52,56,.10)';
+                                            w.style.background='#fff';"
+                                   onblur="var w=document.getElementById('barcode-wrap');
+                                           w.style.borderColor='#e5e7eb';
+                                           w.style.boxShadow='none';
+                                           w.style.background='#f9fafb';" />
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPCION -->
+                    <div>
+                        <label style="display:block;font-size:9.5px;font-weight:700;color:#6b7280;
+                                      text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Descripcion</label>
+                        <div id="desc-wrap"
+                             style="display:flex;align-items:center;gap:8px;
+                                    border:1.5px solid #e5e7eb;border-radius:10px;
+                                    background:#f9fafb;padding:0 10px;
+                                    transition:border-color .2s,box-shadow .2s,background .2s;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none"
+                                 viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2" style="flex-shrink:0;">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7
+                                       a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7
+                                       A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                            </svg>
+                            <input type="text" name="item_name" required placeholder="Ej: Soprole Leche Entera 1L"
+                                   style="flex:1;border:none;outline:none;background:transparent;
+                                          padding:7px 0;font-size:12px;color:#111827;min-width:0;"
+                                   onfocus="var w=document.getElementById('desc-wrap');
+                                            w.style.borderColor='#d13438';
+                                            w.style.boxShadow='0 0 0 3px rgba(209,52,56,.10)';
+                                            w.style.background='#fff';"
+                                   onblur="var w=document.getElementById('desc-wrap');
+                                           w.style.borderColor='#e5e7eb';
+                                           w.style.boxShadow='none';
+                                           w.style.background='#f9fafb';" />
+                        </div>
+                    </div>
+
+                    <!-- CANTIDAD + FOTO en fila -->
+                    <div style="display:flex;gap:10px;align-items:flex-start;">
+                        <!-- Cantidad -->
+                        <div style="flex-shrink:0;">
+                            <label style="display:block;font-size:9.5px;font-weight:700;color:#6b7280;
+                                          text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Cant.</label>
+                            <div id="qty-wrap"
+                                 style="display:flex;align-items:center;gap:6px;
+                                        border:1.5px solid #e5e7eb;border-radius:10px;
+                                        background:#f9fafb;padding:0 10px;width:90px;
+                                        transition:border-color .2s,box-shadow .2s,background .2s;">
+                                <input type="number" name="quantity" min="1" max="100" value="1" required
+                                       style="flex:1;border:none;outline:none;background:transparent;
+                                              padding:7px 0;font-size:12px;color:#111827;min-width:0;
+                                              -moz-appearance:textfield;"
+                                       onfocus="var w=document.getElementById('qty-wrap');
+                                                w.style.borderColor='#d13438';
+                                                w.style.boxShadow='0 0 0 3px rgba(209,52,56,.10)';
+                                                w.style.background='#fff';"
+                                       onblur="var w=document.getElementById('qty-wrap');
+                                               w.style.borderColor='#e5e7eb';
+                                               w.style.boxShadow='none';
+                                               w.style.background='#f9fafb';" />
+                            </div>
+                        </div>
+
+                        <!-- Foto (botones compactos en fila) -->
+                        <div style="flex:1;">
+                            <label style="display:block;font-size:9.5px;font-weight:700;color:#6b7280;
+                                          text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Foto <span style="font-weight:400;text-transform:none;color:#9ca3af;font-size:9px;">(opcional)</span></label>
+                            <div style="display:flex;gap:6px;">
+                                <button type="button" onclick="triggerCamera()"
+                                        style="flex:1;background:#f9fafb;border:1.5px solid #e5e7eb;
+                                               border-radius:10px;padding:7px 4px;
+                                               display:flex;align-items:center;justify-content:center;gap:5px;
+                                               cursor:pointer;transition:background .15s,border-color .15s;"
+                                        onmouseover="this.style.background='#eff6ff';this.style.borderColor='#0053e2';"
+                                        onmouseout="this.style.background='#f9fafb';this.style.borderColor='#e5e7eb';">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                                         viewBox="0 0 24 24" stroke="#0053e2" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22
+                                               A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22
+                                               A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5
+                                               a2 2 0 01-2-2V9z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span style="font-size:10px;font-weight:700;color:#374151;">Camara</span>
+                                </button>
+                                <button type="button" onclick="triggerGallery()"
+                                        style="flex:1;background:#f9fafb;border:1.5px solid #e5e7eb;
+                                               border-radius:10px;padding:7px 4px;
+                                               display:flex;align-items:center;justify-content:center;gap:5px;
+                                               cursor:pointer;transition:background .15s,border-color .15s;"
+                                        onmouseover="this.style.background='#f0fdf4';this.style.borderColor='#16a34a';"
+                                        onmouseout="this.style.background='#f9fafb';this.style.borderColor='#e5e7eb';">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                                         viewBox="0 0 24 24" stroke="#16a34a" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16
+                                               m-2-2l1.586-1.586a2 2 0 012.828 0L20 14
+                                               m-6-6h.01M6 20h12a2 2 0 002-2V6
+                                               a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span style="font-size:10px;font-weight:700;color:#374151;">Galeria</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Preview foto (compacto, max 80px alto) -->
+                    <div id="photo-preview-container" class="hidden"
+                         style="position:relative;width:100%;max-height:80px;
+                                background:#000;border-radius:10px;overflow:hidden;
+                                border:1px solid #e5e7eb;display:flex;align-items:center;justify-content:center;">
+                        <img id="photo-preview" src="#" alt="Preview"
+                             style="max-width:100%;max-height:80px;object-fit:contain;" />
+                        <button type="button" onclick="clearPhotoInputs(event)"
+                                style="position:absolute;top:4px;right:4px;
+                                       background:rgba(0,0,0,.6);border:none;
+                                       border-radius:6px;padding:4px;
+                                       cursor:pointer;display:flex;align-items:center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none"
+                                 viewBox="0 0 24 24" stroke="white" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862
+                                       a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4
+                                       a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Inputs ocultos -->
+                    <input id="camera-only-input" name="photo_camera" type="file"
+                           accept="image/*" capture="environment"
+                           style="display:none;" onchange="previewPhotoSelected(this)" />
+                    <input id="gallery-only-input" name="photo_gallery" type="file"
+                           accept="image/*" style="display:none;" onchange="previewPhotoSelected(this)" />
+
+                    <!-- SUBMIT -->
+                    <button type="submit"
+                            style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+                                   background:linear-gradient(145deg,#d13438 0%,#a52b2e 100%);
+                                   color:white;border:none;border-radius:12px;
+                                   padding:12px;font-size:13px;font-weight:700;
+                                   letter-spacing:.04em;
+                                   box-shadow:0 4px 14px rgba(209,52,56,.32);
+                                   cursor:pointer;transition:filter .15s,transform .15s;"
+                            onmouseover="this.style.filter='brightness(.92)'"
+                            onmouseout="this.style.filter=''"
+                            onmousedown="this.style.transform='scale(.98)'"
+                            onmouseup="this.style.transform=''">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                             viewBox="0 0 24 24" stroke="white" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11
+                                   a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341
+                                   C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436
+                                   L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        ENVIAR ALERTA
+                    </button>
+                </form>
+            </div>
+        </div>
 
                 <!-- Handle + Header -->
                 <div style="padding:12px 20px 0;">
@@ -910,7 +1130,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=21" defer></script>
+        <script src="/js/app.js?v=22" defer></script>
     </body>
     </html>
     """

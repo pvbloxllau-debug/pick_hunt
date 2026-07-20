@@ -222,20 +222,31 @@
             modal.classList.remove('hidden');
             setTimeout(function() {
                 modal.classList.remove('opacity-0');
-                var content = modal.firstElementChild;
-                if (content) content.classList.remove('translate-y-full');
+                var sheet = document.getElementById('report-modal-sheet');
+                if (sheet) sheet.classList.remove('translate-y-full');
             }, 10);
         }
         function closeReportModal() {
             var modal = document.getElementById('mobile-report-modal');
             if (!modal) return;
             modal.classList.add('opacity-0');
-            var content = modal.firstElementChild;
-            if (content) content.classList.add('translate-y-full');
+            var sheet = document.getElementById('report-modal-sheet');
+            if (sheet) sheet.classList.add('translate-y-full');
             setTimeout(function() {
                 modal.classList.add('hidden');
                 modal.style.display = '';
             }, 300);
+        }
+        /* Ajuste visual viewport iOS (teclado virtual) */
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', function() {
+                var modal = document.getElementById('mobile-report-modal');
+                if (!modal || modal.classList.contains('hidden')) return;
+                var sheet = document.getElementById('report-modal-sheet');
+                if (!sheet) return;
+                var available = window.visualViewport.height;
+                sheet.style.maxHeight = Math.round(available * 0.94) + 'px';
+            });
         }
         function submitReportModal(event) {
             if (event) event.preventDefault();
