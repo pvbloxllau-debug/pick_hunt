@@ -992,33 +992,35 @@ def dashboard_get(request: Request):
         </div>
         <!-- Input + boton en fila -->
         <div style="display:flex;align-items:center;gap:8px;">
-            <div style="flex:1;position:relative;">
-                <span style="position:absolute;left:10px;top:0;bottom:0;
-                             display:inline-flex;align-items:center;
-                             pointer-events:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
-                         viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 10h.01M12 10h.01M16 10h.01
-                               M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949
-                               L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12
-                               c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
-                </span>
+            <!-- Wrapper con borde — icono + input como flex siblings -->
+            <div id="sup-input-wrap"
+                 style="flex:1;display:flex;align-items:center;gap:6px;
+                        border:1.5px solid #e5e7eb;border-radius:12px;
+                        background:#f9fafb;padding:0 10px;
+                        transition:border-color .2s,box-shadow .2s,background .2s;"
+                 onclick="document.getElementById('broadcast-text').focus()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                     viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2" style="flex-shrink:0;">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8 10h.01M12 10h.01M16 10h.01
+                           M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949
+                           L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12
+                           c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
                 <input id="broadcast-text" type="text" maxlength="120"
                     placeholder="Que necesita saber el equipo? Ej: Llego pallet, quedar en zona transito."
-                    style="width:100%;box-sizing:border-box;
-                           border:1.5px solid #e5e7eb;border-radius:12px;
-                           padding:8px 12px 8px 28px;
-                           font-size:12px;color:#111827;outline:none;background:#f9fafb;
-                           transition:border-color .2s,box-shadow .2s;"
-                    onfocus="this.style.borderColor='#0053e2';
-                             this.style.boxShadow='0 0 0 3px rgba(0,83,226,.10)';
-                             this.style.background='#fff';"
-                    onblur="this.style.borderColor='#e5e7eb';
-                            this.style.boxShadow='none';
-                            this.style.background='#f9fafb';"
-                    onkeydown="if(event.key==='Enter') sendBroadcast()" /></n            </div>
+                    style="flex:1;border:none;outline:none;background:transparent;
+                           padding:8px 0;font-size:12px;color:#111827;min-width:0;"
+                    onfocus="var w=document.getElementById('sup-input-wrap');
+                             w.style.borderColor='#0053e2';
+                             w.style.boxShadow='0 0 0 3px rgba(0,83,226,.10)';
+                             w.style.background='#fff';"
+                    onblur="var w=document.getElementById('sup-input-wrap');
+                            w.style.borderColor='#e5e7eb';
+                            w.style.boxShadow='none';
+                            w.style.background='#f9fafb';"
+                    onkeydown="if(event.key==='Enter') sendBroadcast()" />
+            </div>
             <button onclick="sendBroadcast()"
                 style="flex-shrink:0;display:flex;align-items:center;gap:6px;
                        background:#0053e2;color:white;font-weight:600;font-size:12px;
@@ -1060,33 +1062,33 @@ def dashboard_get(request: Request):
         </div>
         <!-- Input + boton en fila -->
         <div style="display:flex;align-items:center;gap:8px;">
-            <!-- Campo con icono mensaje adentro -->
-            <div style="flex:1;position:relative;">
-                <span style="position:absolute;left:10px;top:0;bottom:0;
-                             display:inline-flex;align-items:center;
-                             pointer-events:none;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
-                         viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8 10h.01M12 10h.01M16 10h.01
-                               M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949
-                               L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12
-                               c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
-                </span>
+            <!-- Wrapper con borde — icono + input como flex siblings -->
+            <div id="hun-input-wrap"
+                 style="flex:1;display:flex;align-items:center;gap:6px;
+                        border:1.5px solid #e5e7eb;border-radius:12px;
+                        background:#f9fafb;padding:0 10px;
+                        transition:border-color .2s,box-shadow .2s,background .2s;"
+                 onclick="document.getElementById('hunter-broadcast-text').focus()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                     viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2" style="flex-shrink:0;">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M8 10h.01M12 10h.01M16 10h.01
+                           M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949
+                           L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12
+                           c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
                 <input id="hunter-broadcast-text" type="text" maxlength="100"
                     placeholder="Que necesita el equipo? Ej: Gondola A3 sin stock de leche."
-                    style="width:100%;box-sizing:border-box;
-                           border:1.5px solid #e5e7eb;border-radius:12px;
-                           padding:8px 12px 8px 28px;
-                           font-size:12px;color:#111827;outline:none;background:#f9fafb;
-                           transition:border-color .2s,box-shadow .2s;"
-                    onfocus="this.style.borderColor='#E67E00';
-                             this.style.boxShadow='0 0 0 3px rgba(230,126,0,.12)';
-                             this.style.background='#fff';"
-                    onblur="this.style.borderColor='#e5e7eb';
-                            this.style.boxShadow='none';
-                            this.style.background='#f9fafb';"
+                    style="flex:1;border:none;outline:none;background:transparent;
+                           padding:8px 0;font-size:12px;color:#111827;min-width:0;"
+                    onfocus="var w=document.getElementById('hun-input-wrap');
+                             w.style.borderColor='#E67E00';
+                             w.style.boxShadow='0 0 0 3px rgba(230,126,0,.12)';
+                             w.style.background='#fff';"
+                    onblur="var w=document.getElementById('hun-input-wrap');
+                            w.style.borderColor='#e5e7eb';
+                            w.style.boxShadow='none';
+                            w.style.background='#f9fafb';"
                     onkeydown="if(event.key==='Enter') sendHunterBroadcast()" />
             </div>
             <!-- Boton naranja -->
