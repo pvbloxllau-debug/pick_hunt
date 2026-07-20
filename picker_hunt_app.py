@@ -970,20 +970,68 @@ def dashboard_get(request: Request):
     # Panel de aviso general — solo visible para supervisor
     if user['role'] == 'supervisor':
         broadcast_panel = """
-    <div class="bg-[#0053e2]/5 border border-[#0053e2]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
-        <div class="flex items-center gap-2 flex-shrink-0">
-            <span class="text-lg"> </span>
-            <span class="text-xs font-black text-[#0053e2] uppercase tracking-widest">Aviso a todos</span>
+    <div style="background:#ffffff;border:1px solid #f0f0f0;border-radius:20px;
+                padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06);
+                display:flex;flex-direction:column;gap:10px;">
+        <!-- Titulo compact -->
+        <div style="display:flex;align-items:center;gap:7px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                 viewBox="0 0 24 24" stroke="#0053e2" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15
+                       M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832
+                       c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7
+                       a3.928 3.928 0 01-1.564-.317z"/>
+            </svg>
+            <span style="font-size:12px;font-weight:600;color:#374151;">Aviso a todos</span>
         </div>
-        <input id="broadcast-text" type="text" maxlength="120"
-            placeholder="Ej: Llego pallet, quedar en zona transito..."
-            class="flex-1 w-full border border-[#0053e2]/30 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0053e2]/40 bg-white"
-            onkeydown="if(event.key==='Enter') sendBroadcast()"
-        />
-        <button onclick="sendBroadcast()"
-            class="flex-shrink-0 bg-[#0053e2] hover:bg-blue-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition active:scale-95">
-            Enviar
-        </button>
+        <!-- Input + boton en fila -->
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div style="flex:1;position:relative;">
+                <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);
+                             pointer-events:none;display:flex;align-items:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                         viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 10h.01M12 10h.01M16 10h.01
+                               M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949
+                               L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12
+                               c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                </span>
+                <input id="broadcast-text" type="text" maxlength="120"
+                    placeholder="Que necesita saber el equipo? Ej: Llego pallet, quedar en zona transito."
+                    style="width:100%;box-sizing:border-box;
+                           border:1.5px solid #e5e7eb;border-radius:14px;
+                           padding:10px 14px 10px 33px;
+                           font-size:12.5px;color:#111827;outline:none;background:#f9fafb;
+                           transition:border-color .2s,box-shadow .2s;"
+                    onfocus="this.style.borderColor='#0053e2';
+                             this.style.boxShadow='0 0 0 3px rgba(0,83,226,.10)';
+                             this.style.background='#fff';"
+                    onblur="this.style.borderColor='#e5e7eb';
+                            this.style.boxShadow='none';
+                            this.style.background='#f9fafb';"
+                    onkeydown="if(event.key==='Enter') sendBroadcast()" />
+            </div>
+            <button onclick="sendBroadcast()"
+                style="flex-shrink:0;display:flex;align-items:center;gap:6px;
+                       background:#0053e2;color:white;font-weight:600;font-size:12.5px;
+                       padding:10px 16px;border-radius:14px;border:none;cursor:pointer;
+                       box-shadow:0 2px 8px rgba(0,83,226,.25);
+                       transition:opacity .15s,transform .1s;"
+                onmouseover="this.style.opacity='.88'"
+                onmouseout="this.style.opacity='1'"
+                onmousedown="this.style.transform='scale(.97)'"
+                onmouseup="this.style.transform='scale(1)'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                     viewBox="0 0 24 24" stroke="white" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+                Enviar
+            </button>
+        </div>
     </div>"""
     elif user['role'] == 'hunter':
         broadcast_panel = """
