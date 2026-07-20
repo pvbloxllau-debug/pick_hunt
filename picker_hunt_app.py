@@ -1678,23 +1678,17 @@ def api_equipo_online(request: Request):
 
     total_members = len(members)
     html = (
-        # Header icono + titulo (replicado aqui porque hx-swap=innerHTML reemplaza TODO dentro del div)
         f'<div style="display:flex;align-items:center;justify-content:space-between;">'
         f'<span style="font-size:11px;font-weight:600;color:#6b7280;">Equipo</span>'
         f'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="1.8" opacity=".7">'
         f'<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>'
         f'</svg></div>'
-        # Numero grande
         f'<div style="margin:8px 0 4px;">'
         f'<h3 style="font-size:46px;font-weight:900;color:#16a34a;line-height:1;margin:0;">'
         f'{online_count}</h3>'
         f'<p style="font-size:10px;color:#9ca3af;margin:4px 0 0;font-weight:500;">'
         f'de {total_members} conectados</p>'
         f'</div>'
-        # Lista miembros compacta
-        f'<div style="display:flex;flex-direction:column;gap:1px;margin-top:6px;'
-        f'max-height:90px;overflow:hidden;">'
-        f'{rows_html}</div>'
     )
     return HTMLResponse(content=html)
 
