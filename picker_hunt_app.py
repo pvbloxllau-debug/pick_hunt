@@ -987,21 +987,73 @@ def dashboard_get(request: Request):
     </div>"""
     elif user['role'] == 'hunter':
         broadcast_panel = """
-    <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:16px;padding:16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
-        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#92400e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            <span style="font-size:11px;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:0.08em;">Notificar al equipo</span>
+    <div style="background:#ffffff;border:1px solid #f0f0f0;border-radius:20px;
+                padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06);
+                display:flex;flex-direction:column;gap:10px;">
+        <!-- Titulo compact -->
+        <div style="display:flex;align-items:center;gap:7px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                 viewBox="0 0 24 24" stroke="#E67E00" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2
+                       c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857
+                       M7 20v-2c0-.656.126-1.283.356-1.857
+                       m0 0a5.002 5.002 0 019.288 0
+                       M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <span style="font-size:12px;font-weight:600;color:#374151;">
+                Notificar al equipo
+            </span>
         </div>
-        <input id="hunter-broadcast-text" type="text" maxlength="100"
-            placeholder="Ej: Gondola A3 necesita reposicion..."
-            style="flex:1;min-width:180px;border:1px solid rgba(234,179,8,0.40);border-radius:12px;padding:10px 14px;font-size:13px;outline:none;background:white;"
-            onkeydown="if(event.key==='Enter') sendHunterBroadcast()"
-        />
-        <button onclick="sendHunterBroadcast()"
-            style="flex-shrink:0;background:#d97706;color:white;font-weight:700;font-size:13px;padding:10px 20px;border-radius:12px;border:none;cursor:pointer;transition:opacity .15s;"
-            onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-            Notificar
-        </button>
+        <!-- Input + boton en fila -->
+        <div style="display:flex;align-items:center;gap:8px;">
+            <!-- Campo con icono mensaje adentro -->
+            <div style="flex:1;position:relative;">
+                <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);
+                             pointer-events:none;display:flex;align-items:center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                         viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 10h.01M12 10h.01M16 10h.01
+                               M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949
+                               L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12
+                               c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                </span>
+                <input id="hunter-broadcast-text" type="text" maxlength="100"
+                    placeholder="Que necesita el equipo? Ej: Gondola A3 sin stock de leche."
+                    style="width:100%;box-sizing:border-box;
+                           border:1.5px solid #e5e7eb;border-radius:14px;
+                           padding:10px 14px 10px 33px;
+                           font-size:12.5px;color:#111827;outline:none;background:#f9fafb;
+                           transition:border-color .2s,box-shadow .2s;"
+                    onfocus="this.style.borderColor='#E67E00';
+                             this.style.boxShadow='0 0 0 3px rgba(230,126,0,.12)';
+                             this.style.background='#fff';"
+                    onblur="this.style.borderColor='#e5e7eb';
+                            this.style.boxShadow='none';
+                            this.style.background='#f9fafb';"
+                    onkeydown="if(event.key==='Enter') sendHunterBroadcast()" />
+            </div>
+            <!-- Boton naranja -->
+            <button onclick="sendHunterBroadcast()"
+                style="flex-shrink:0;display:flex;align-items:center;gap:6px;
+                       background:#E67E00;color:white;font-weight:600;font-size:12.5px;
+                       padding:10px 16px;border-radius:14px;border:none;cursor:pointer;
+                       box-shadow:0 2px 8px rgba(230,126,0,.30);
+                       transition:opacity .15s,transform .1s;"
+                onmouseover="this.style.opacity='.88'"
+                onmouseout="this.style.opacity='1'"
+                onmousedown="this.style.transform='scale(.97)'"
+                onmouseup="this.style.transform='scale(1)'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
+                     viewBox="0 0 24 24" stroke="white" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                </svg>
+                Notificar
+            </button>
+        </div>
     </div>"""
     else:
         broadcast_panel = ""
