@@ -1113,21 +1113,21 @@ def dashboard_get(request: Request):
     alerta_btn = """
         <button onclick="openReportModal()"
             style="width:100%;display:flex;align-items:center;gap:14px;
-                   background:linear-gradient(145deg,#cd364b 0%,#b02b3e 100%);
+                   background:linear-gradient(145deg,#d13438 0%,#a52b2e 100%);
                    color:white;border:none;border-radius:22px;
                    padding:18px 22px;
                    cursor:pointer;position:relative;
-                   box-shadow:0 8px 24px rgba(205,54,75,.38),0 2px 6px rgba(0,0,0,.12);
+                   box-shadow:0 8px 24px rgba(209,52,56,.38),0 2px 6px rgba(0,0,0,.12);
                    outline:1.5px solid rgba(255,255,255,.13);outline-offset:-1.5px;
                    transition:transform .15s,box-shadow .15s,filter .15s;"
             onmouseover="this.style.filter='brightness(.9)';this.style.transform='translateY(-2px)';
-                         this.style.boxShadow='0 14px 32px rgba(205,54,75,.48),0 4px 12px rgba(0,0,0,.18)';"
+                         this.style.boxShadow='0 14px 32px rgba(209,52,56,.48),0 4px 12px rgba(0,0,0,.18)';"
             onmouseout="this.style.filter='';this.style.transform='';
-                        this.style.boxShadow='0 8px 24px rgba(205,54,75,.38),0 2px 6px rgba(0,0,0,.12)';"
+                        this.style.boxShadow='0 8px 24px rgba(209,52,56,.38),0 2px 6px rgba(0,0,0,.12)';"
             onmousedown="this.style.transform='scale(.97)';
-                         this.style.boxShadow='0 3px 10px rgba(205,54,75,.30)';"
+                         this.style.boxShadow='0 3px 10px rgba(209,52,56,.30)';"
             onmouseup="this.style.transform='';
-                       this.style.boxShadow='0 8px 24px rgba(205,54,75,.38),0 2px 6px rgba(0,0,0,.12)';">
+                       this.style.boxShadow='0 8px 24px rgba(209,52,56,.38),0 2px 6px rgba(0,0,0,.12)';">
             <!-- Dot pulsante -->
             <span style="width:9px;height:9px;border-radius:50%;background:white;
                          opacity:.9;flex-shrink:0;animation:pulse 1.5s infinite;"></span>
