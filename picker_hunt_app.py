@@ -1111,11 +1111,44 @@ def dashboard_get(request: Request):
     else:
         broadcast_panel = ""
     alerta_btn = """
-        <button onclick="openReportModal()" class="flex w-full bg-[#e11d48] text-white font-extrabold text-sm py-4 rounded-2xl hover:bg-rose-700 transition items-center justify-center gap-2 shadow-lg shadow-rose-500/20 uppercase tracking-wider">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <button onclick="openReportModal()"
+            style="width:100%;display:flex;align-items:center;gap:14px;
+                   background:linear-gradient(145deg,#dc2626 0%,#b91c1c 100%);
+                   color:white;border:none;border-radius:22px;
+                   padding:18px 22px;
+                   cursor:pointer;position:relative;
+                   box-shadow:0 8px 24px rgba(220,38,38,.38),0 2px 6px rgba(0,0,0,.12);
+                   outline:1.5px solid rgba(255,255,255,.13);outline-offset:-1.5px;
+                   transition:transform .15s,box-shadow .15s,filter .15s;"
+            onmouseover="this.style.filter='brightness(.9)';this.style.transform='translateY(-2px)';
+                         this.style.boxShadow='0 14px 32px rgba(220,38,38,.48),0 4px 12px rgba(0,0,0,.18)';"
+            onmouseout="this.style.filter='';this.style.transform='';
+                        this.style.boxShadow='0 8px 24px rgba(220,38,38,.38),0 2px 6px rgba(0,0,0,.12)';"
+            onmousedown="this.style.transform='scale(.97)';
+                         this.style.boxShadow='0 3px 10px rgba(220,38,38,.30)';"
+            onmouseup="this.style.transform='';
+                       this.style.boxShadow='0 8px 24px rgba(220,38,38,.38),0 2px 6px rgba(0,0,0,.12)';">
+            <!-- Dot pulsante -->
+            <span style="width:9px;height:9px;border-radius:50%;background:white;
+                         opacity:.9;flex-shrink:0;animation:pulse 1.5s infinite;"></span>
+            <!-- Icono campana con pulso suave -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none"
+                 viewBox="0 0 24 24" stroke="white" stroke-width="2"
+                 style="flex-shrink:0;animation:pulse 3s ease-in-out infinite;">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11
+                       a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341
+                       C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436
+                       L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
             </svg>
-            ALERTA QUIEBRE
+            <!-- Texto -->
+            <span style="flex:1;font-size:14px;font-weight:700;letter-spacing:.06em;
+                         text-align:left;line-height:1.2;">ALERTA DE QUIEBRE</span>
+            <!-- Flecha sutil derecha -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                 viewBox="0 0 24 24" stroke="white" stroke-width="2.5" opacity=".5" style="flex-shrink:0;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
         </button>""" if can_report else f"""
         <div class="flex w-full bg-[#0053e2]/10 border-2 border-dashed border-[#0053e2]/30 text-[#0053e2] font-extrabold text-sm py-4 rounded-2xl items-center justify-center gap-2 uppercase tracking-wider">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
