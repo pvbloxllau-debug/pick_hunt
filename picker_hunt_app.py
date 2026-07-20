@@ -975,9 +975,9 @@ def dashboard_get(request: Request):
     # Panel de aviso general — solo visible para supervisor
     if user['role'] == 'supervisor':
         broadcast_panel = """
-    <div style="background:#ffffff;border:1px solid #f0f0f0;border-radius:20px;
-                padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06);
-                display:flex;flex-direction:column;gap:10px;">
+    <div style="background:#ffffff;border:1px solid #f0f0f0;border-radius:18px;
+                padding:10px 12px;box-shadow:0 1px 6px rgba(0,0,0,.06);
+                display:flex;flex-direction:column;gap:8px;">
         <!-- Titulo compact -->
         <div style="display:flex;align-items:center;gap:7px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
@@ -1007,9 +1007,9 @@ def dashboard_get(request: Request):
                 <input id="broadcast-text" type="text" maxlength="120"
                     placeholder="Que necesita saber el equipo? Ej: Llego pallet, quedar en zona transito."
                     style="width:100%;box-sizing:border-box;
-                           border:1.5px solid #e5e7eb;border-radius:14px;
-                           padding:10px 14px 10px 33px;
-                           font-size:12.5px;color:#111827;outline:none;background:#f9fafb;
+                           border:1.5px solid #e5e7eb;border-radius:12px;
+                           padding:8px 12px 8px 30px;
+                           font-size:12px;color:#111827;outline:none;background:#f9fafb;
                            transition:border-color .2s,box-shadow .2s;"
                     onfocus="this.style.borderColor='#0053e2';
                              this.style.boxShadow='0 0 0 3px rgba(0,83,226,.10)';
@@ -1017,12 +1017,11 @@ def dashboard_get(request: Request):
                     onblur="this.style.borderColor='#e5e7eb';
                             this.style.boxShadow='none';
                             this.style.background='#f9fafb';"
-                    onkeydown="if(event.key==='Enter') sendBroadcast()" />
-            </div>
+                    onkeydown="if(event.key==='Enter') sendBroadcast()" /></n            </div>
             <button onclick="sendBroadcast()"
                 style="flex-shrink:0;display:flex;align-items:center;gap:6px;
-                       background:#0053e2;color:white;font-weight:600;font-size:12.5px;
-                       padding:10px 16px;border-radius:14px;border:none;cursor:pointer;
+                       background:#0053e2;color:white;font-weight:600;font-size:12px;
+                       padding:8px 14px;border-radius:12px;border:none;cursor:pointer;
                        box-shadow:0 2px 8px rgba(0,83,226,.25);
                        transition:opacity .15s,transform .1s;"
                 onmouseover="this.style.opacity='.88'"
@@ -1040,9 +1039,9 @@ def dashboard_get(request: Request):
     </div>"""
     elif user['role'] == 'hunter':
         broadcast_panel = """
-    <div style="background:#ffffff;border:1px solid #f0f0f0;border-radius:20px;
-                padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06);
-                display:flex;flex-direction:column;gap:10px;">
+    <div style="background:#ffffff;border:1px solid #f0f0f0;border-radius:18px;
+                padding:10px 12px;box-shadow:0 1px 6px rgba(0,0,0,.06);
+                display:flex;flex-direction:column;gap:8px;">
         <!-- Titulo compact -->
         <div style="display:flex;align-items:center;gap:7px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
@@ -1076,9 +1075,9 @@ def dashboard_get(request: Request):
                 <input id="hunter-broadcast-text" type="text" maxlength="100"
                     placeholder="Que necesita el equipo? Ej: Gondola A3 sin stock de leche."
                     style="width:100%;box-sizing:border-box;
-                           border:1.5px solid #e5e7eb;border-radius:14px;
-                           padding:10px 14px 10px 33px;
-                           font-size:12.5px;color:#111827;outline:none;background:#f9fafb;
+                           border:1.5px solid #e5e7eb;border-radius:12px;
+                           padding:8px 12px 8px 30px;
+                           font-size:12px;color:#111827;outline:none;background:#f9fafb;
                            transition:border-color .2s,box-shadow .2s;"
                     onfocus="this.style.borderColor='#E67E00';
                              this.style.boxShadow='0 0 0 3px rgba(230,126,0,.12)';
@@ -1091,8 +1090,8 @@ def dashboard_get(request: Request):
             <!-- Boton naranja -->
             <button onclick="sendHunterBroadcast()"
                 style="flex-shrink:0;display:flex;align-items:center;gap:6px;
-                       background:#E67E00;color:white;font-weight:600;font-size:12.5px;
-                       padding:10px 16px;border-radius:14px;border:none;cursor:pointer;
+                       background:#E67E00;color:white;font-weight:600;font-size:12px;
+                       padding:8px 14px;border-radius:12px;border:none;cursor:pointer;
                        box-shadow:0 2px 8px rgba(230,126,0,.30);
                        transition:opacity .15s,transform .1s;"
                 onmouseover="this.style.opacity='.88'"
@@ -1112,10 +1111,10 @@ def dashboard_get(request: Request):
         broadcast_panel = ""
     alerta_btn = """
         <button onclick="openReportModal()"
-            style="width:100%;display:flex;align-items:center;gap:14px;
+            style="width:100%;display:flex;align-items:center;gap:10px;
                    background:linear-gradient(145deg,#d13438 0%,#a52b2e 100%);
-                   color:white;border:none;border-radius:22px;
-                   padding:18px 22px;
+                   color:white;border:none;border-radius:18px;
+                   padding:13px 20px;
                    cursor:pointer;position:relative;
                    box-shadow:0 8px 24px rgba(209,52,56,.38),0 2px 6px rgba(0,0,0,.12);
                    outline:1.5px solid rgba(255,255,255,.13);outline-offset:-1.5px;
@@ -1132,7 +1131,7 @@ def dashboard_get(request: Request):
             <span style="width:9px;height:9px;border-radius:50%;background:white;
                          opacity:.9;flex-shrink:0;animation:pulse 1.5s infinite;"></span>
             <!-- Icono campana con pulso suave -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none"
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                  viewBox="0 0 24 24" stroke="white" stroke-width="2"
                  style="flex-shrink:0;animation:pulse 3s ease-in-out infinite;">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -1163,12 +1162,12 @@ def dashboard_get(request: Request):
     # Render dashboard shell
     dashboard_html = f"""
     <!-- TOP METRICS ROW -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
 
         <!-- CARD 1: ACTIVAS (azul) -->
-        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
-                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
-                    border-left:4px solid #0053e2;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:#fff;border-radius:18px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 8px rgba(0,0,0,.05);padding:12px;
+                    border-left:4px solid #0053e2;display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span style="font-size:11px;font-weight:600;color:#6b7280;">Activas</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-width="1.8" opacity=".7">
@@ -1177,9 +1176,9 @@ def dashboard_get(request: Request):
             </div>
             <div>
                 <h3 id="metric-active-hunts"
-                    style="font-size:46px;font-weight:900;color:#0053e2;line-height:1;margin:0;
+                    style="font-size:36px;font-weight:900;color:#0053e2;line-height:1;margin:0;
                            transition:transform .2s;">...</h3>
-                <p style="font-size:10px;color:#9ca3af;margin:4px 0 0;font-weight:500;">Alertas pendientes</p>
+                <p style="font-size:10px;color:#9ca3af;margin:2px 0 0;font-weight:500;">Alertas pendientes</p>
             </div>
             <div style="display:flex;align-items:center;gap:5px;">
                 <span style="width:7px;height:7px;border-radius:50%;background:#16a34a;
@@ -1190,8 +1189,8 @@ def dashboard_get(request: Request):
         </div>
 
         <!-- CARD 2: EQUIPO (verde) -->
-        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
-                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
+        <div style="background:#fff;border-radius:18px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 8px rgba(0,0,0,.05);padding:12px;
                     border-left:4px solid #16a34a;"
              hx-get="/api/equipo-online"
              hx-trigger="load, every 10s"
@@ -1206,9 +1205,9 @@ def dashboard_get(request: Request):
         </div>
 
         <!-- CARD 3: CUMPLIMIENTO (dinamico) -->
-        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
-                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
-                    border-left:4px solid {completitud_color};display:flex;flex-direction:column;gap:10px;">
+        <div style="background:#fff;border-radius:18px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 8px rgba(0,0,0,.05);padding:12px;
+                    border-left:4px solid {completitud_color};display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span style="font-size:11px;font-weight:600;color:#6b7280;">Cumplimiento</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="{completitud_color}" stroke-width="1.8" opacity=".7">
@@ -1216,9 +1215,9 @@ def dashboard_get(request: Request):
                 </svg>
             </div>
             <div>
-                <h3 style="font-size:46px;font-weight:900;color:{completitud_color};line-height:1;margin:0;
+                <h3 style="font-size:36px;font-weight:900;color:{completitud_color};line-height:1;margin:0;
                            transition:color .4s;">{completitud_pct}%</h3>
-                <p style="font-size:10px;color:#9ca3af;margin:4px 0 0;font-weight:500;">Meta 96% &nbsp;&middot;&nbsp; {resolved_hunts}/{total_hunts} hoy</p>
+                <p style="font-size:10px;color:#9ca3af;margin:2px 0 0;font-weight:500;">Meta 96% &nbsp;&middot;&nbsp; {resolved_hunts}/{total_hunts} hoy</p>
             </div>
             <!-- Barra progreso -->
             <div style="background:#f3f4f6;border-radius:999px;height:5px;overflow:hidden;">
@@ -1228,9 +1227,9 @@ def dashboard_get(request: Request):
         </div>
 
         <!-- CARD 4: CATEGORIAS FOCO (naranja) -->
-        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
-                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
-                    border-left:4px solid #E67E00;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:#fff;border-radius:18px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 8px rgba(0,0,0,.05);padding:12px;
+                    border-left:4px solid #E67E00;display:flex;flex-direction:column;gap:6px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span style="font-size:11px;font-weight:600;color:#6b7280;">Categorias Foco</span>
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#E67E00" stroke-width="1.8" opacity=".7">
@@ -1254,15 +1253,15 @@ def dashboard_get(request: Request):
     {broadcast_panel}
 
     <!-- MAIN INTERACTIVE SECTION -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         
         <!-- COLUMN 1: REPORT & LIVE FEEDS -->
-        <div class="space-y-6 lg:col-span-1">
+        <div class="space-y-3 lg:col-span-1">
             {alerta_btn}
 
             <!-- LIVE ACTIVITY WALL -->
-            <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex flex-col h-[280px] md:h-[400px]">
-                <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
+            <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col h-[240px] md:h-[360px]">
+                <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
                     <div class="flex items-center gap-2">
                         <span class="text-lg"></span>
                         <h2 class="text-xs font-black text-gray-900">Muro de Actividad</h2>
@@ -1270,7 +1269,7 @@ def dashboard_get(request: Request):
                     <span class="bg-blue-50 text-[#0053e2] font-black text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">En Vivo</span>
                 </div>
                 
-                <div id="feed-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-2 pr-1"
+                <div id="feed-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-1 pr-1"
                      hx-get="/api/feed" hx-trigger="load, reload-feed" hx-swap="innerHTML">
                     <div class="text-center py-4 text-gray-400 text-xs">Cargando actividad...</div>
                 </div>
@@ -1278,7 +1277,7 @@ def dashboard_get(request: Request):
         </div>
 
         <!-- COLUMN 2 & 3: ACTIVE HUNTS LIST -->
-        <div class="lg:col-span-2 space-y-4">
+        <div class="lg:col-span-2 space-y-3">
             <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
                 <!-- Search & Filter bar -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
@@ -1716,10 +1715,10 @@ def api_equipo_online(request: Request):
         f'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="1.8" opacity=".7">'
         f'<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>'
         f'</svg></div>'
-        f'<div style="margin:8px 0 4px;">'
-        f'<h3 style="font-size:46px;font-weight:900;color:#16a34a;line-height:1;margin:0;">'
+        f'<div style="margin:4px 0 2px;">'
+        f'<h3 style="font-size:36px;font-weight:900;color:#16a34a;line-height:1;margin:0;">'
         f'{online_count}</h3>'
-        f'<p style="font-size:10px;color:#9ca3af;margin:4px 0 0;font-weight:500;">'
+        f'<p style="font-size:10px;color:#9ca3af;margin:2px 0 0;font-weight:500;">'
         f'de {total_members} conectados</p>'
         f'</div>'
     )
