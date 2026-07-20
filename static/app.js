@@ -196,6 +196,15 @@
             setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 8000);
         }
 
+        /* --- KPI live timestamp (actualiza 'hace X seg' en card Activas) --- */
+        window._kpiLastRefresh = Date.now();
+        setInterval(function() {
+            var el = document.getElementById('kpi-last-update');
+            if (!el) return;
+            var sec = Math.round((Date.now() - window._kpiLastRefresh) / 1000);
+            el.textContent = sec < 5 ? '' : '· hace ' + sec + 's';
+        }, 3000);
+
         /* --- Report Modal --- */
         function openReportModal() {
             var modal = document.getElementById('mobile-report-modal');
@@ -744,8 +753,14 @@
                     fetch('/api/stats-json')
                         .then(function(r) { return r.json(); })
                         .then(function(d) {
-                            if (ae) ae.textContent = d.active;
+                            if (ae) {
+                                ae.textContent = d.active;
+                                ae.style.transform = 'scale(1.12)';
+                                setTimeout(function() { ae.style.transform = 'scale(1)'; }, 200);
+                            }
                             if (fe2) fe2.textContent = d.found;
+                            /* timestamp en vivo */
+                            window._kpiLastRefresh = Date.now();
                         });
                 }
                 return;

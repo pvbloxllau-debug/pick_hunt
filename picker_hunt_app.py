@@ -752,7 +752,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=18" defer></script>
+        <script src="/js/app.js?v=19" defer></script>
     </body>
     </html>
     """
@@ -947,7 +947,12 @@ def dashboard_get(request: Request):
     conn.close()
 
     completitud_pct   = round(resolved_hunts / total_hunts * 100, 1) if total_hunts else 0.0
-    completitud_color = "#16a34a" if completitud_pct >= 96 else "#dc2626"
+    completitud_color = (
+        "#16a34a" if completitud_pct >= 96
+        else "#ca8a04" if completitud_pct >= 80
+        else "#dc2626"
+    )
+    completitud_bar_w = min(100, int(completitud_pct))
 
     # Lista de pickers y hunters para el recuadro Equipo
     _ROLE_STYLE = {
@@ -1126,42 +1131,91 @@ def dashboard_get(request: Request):
     dashboard_html = f"""
     <!-- TOP METRICS ROW -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center justify-between">
+
+        <!-- CARD 1: ACTIVAS (azul) -->
+        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
+                    border-left:4px solid #0053e2;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:11px;font-weight:600;color:#6b7280;">Activas</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-width="1.8" opacity=".7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+            </div>
             <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Activas</p>
-                <h3 class="text-2xl font-black text-[#0053e2] mt-0.5" id="metric-active-hunts">...</h3>
-                <p class="text-[9px] text-[#2a8703] font-bold mt-0.5">● Actualizado live</p>
+                <h3 id="metric-active-hunts"
+                    style="font-size:46px;font-weight:900;color:#0053e2;line-height:1;margin:0;
+                           transition:transform .2s;">...</h3>
+                <p style="font-size:10px;color:#9ca3af;margin:4px 0 0;font-weight:500;">Alertas pendientes</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;">
+                <span style="width:7px;height:7px;border-radius:50%;background:#16a34a;
+                             animation:pulse 1.5s infinite;flex-shrink:0;"></span>
+                <span style="font-size:9.5px;color:#16a34a;font-weight:600;">En vivo</span>
+                <span id="kpi-last-update" style="font-size:9px;color:#9ca3af;margin-left:2px;"></span>
             </div>
         </div>
-        
-        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm"
+
+        <!-- CARD 2: EQUIPO (verde) -->
+        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
+                    border-left:4px solid #16a34a;"
              hx-get="/api/equipo-online"
              hx-trigger="load, every 10s"
              hx-swap="innerHTML">
-            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Equipo</p>
-            <p class="text-[10px] text-gray-400 mt-1">Cargando...</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:11px;font-weight:600;color:#6b7280;">Equipo</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="1.8" opacity=".7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+            </div>
+            <p style="font-size:10px;color:#9ca3af;margin:8px 0 0;">Cargando...</p>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm flex items-center justify-between">
-            <div class="w-full flex justify-between items-center">
-                <div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Cumplimiento</p>
-                    <h3 class="text-2xl font-black mt-0.5" style="color:{completitud_color}">{completitud_pct}%</h3>
-                    <p class="text-[9px] text-gray-500 mt-0.5">Meta: 96% · {resolved_hunts}/{total_hunts} hoy</p>
-                </div>
-                <span class="text-2xl">{'' if completitud_pct >= 96 else ''}</span>
+        <!-- CARD 3: CUMPLIMIENTO (dinamico) -->
+        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
+                    border-left:4px solid {completitud_color};display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:11px;font-weight:600;color:#6b7280;">Cumplimiento</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="{completitud_color}" stroke-width="1.8" opacity=".7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div>
+                <h3 style="font-size:46px;font-weight:900;color:{completitud_color};line-height:1;margin:0;
+                           transition:color .4s;">{completitud_pct}%</h3>
+                <p style="font-size:10px;color:#9ca3af;margin:4px 0 0;font-weight:500;">Meta 96% &nbsp;&middot;&nbsp; {resolved_hunts}/{total_hunts} hoy</p>
+            </div>
+            <!-- Barra progreso -->
+            <div style="background:#f3f4f6;border-radius:999px;height:5px;overflow:hidden;">
+                <div style="height:100%;width:{completitud_bar_w}%;background:{completitud_color};
+                            border-radius:999px;transition:width .6s ease;"></div>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Categorias Foco</p>
-            <div class="flex flex-wrap gap-1.5">
-                <span style="background:#fff3e0;color:#e65100;font-size:9px;font-weight:800;padding:3px 8px;border-radius:999px;border:1px solid #ffcc80;">Cafe</span>
-                <span style="background:#f3e5f5;color:#6a1b9a;font-size:9px;font-weight:800;padding:3px 8px;border-radius:999px;border:1px solid #ce93d8;">Vinos</span>
-                <span style="background:#e3f2fd;color:#0d47a1;font-size:9px;font-weight:800;padding:3px 8px;border-radius:999px;border:1px solid #90caf9;">Checkout</span>
-                <span style="background:#e8f5e9;color:#1b5e20;font-size:9px;font-weight:800;padding:3px 8px;border-radius:999px;border:1px solid #a5d6a7;">Mascota</span>
+        <!-- CARD 4: CATEGORIAS FOCO (naranja) -->
+        <div style="background:#fff;border-radius:20px;border:1px solid #f0f0f0;
+                    box-shadow:0 2px 10px rgba(0,0,0,.05);padding:16px;
+                    border-left:4px solid #E67E00;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:11px;font-weight:600;color:#6b7280;">Categorias Foco</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#E67E00" stroke-width="1.8" opacity=".7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                <span style="background:#fff7ed;color:#c2410c;font-size:9.5px;font-weight:700;
+                             padding:4px 10px;border-radius:12px;border:1px solid #fed7aa;">Cafe</span>
+                <span style="background:#faf5ff;color:#7e22ce;font-size:9.5px;font-weight:700;
+                             padding:4px 10px;border-radius:12px;border:1px solid #e9d5ff;">Vinos</span>
+                <span style="background:#eff6ff;color:#1d4ed8;font-size:9.5px;font-weight:700;
+                             padding:4px 10px;border-radius:12px;border:1px solid #bfdbfe;">Checkout</span>
+                <span style="background:#f0fdf4;color:#15803d;font-size:9.5px;font-weight:700;
+                             padding:4px 10px;border-radius:12px;border:1px solid #bbf7d0;">Mascota</span>
             </div>
         </div>
+
     </div>
 
     {broadcast_panel}
@@ -1604,27 +1658,43 @@ def api_equipo_online(request: Request):
         if is_online:
             online_count += 1
         dot = ('<span style="width:7px;height:7px;border-radius:50%;'
-               'background:#16a34a;display:inline-block;flex-shrink:0;"></span>'
+               'background:#16a34a;display:inline-block;flex-shrink:0;animation:pulse 2s infinite;"></span>'
                if is_online else
                '<span style="width:7px;height:7px;border-radius:50%;'
                'background:#d1d5db;display:inline-block;flex-shrink:0;"></span>')
-        opacity = '1.0' if is_online else '0.45'
+        opacity = '1.0' if is_online else '0.4'
         sty, label = _ROLE_STYLE[m['role']]
         rows_html += (
-            f'<div style="display:flex;align-items:center;gap:6px;opacity:{opacity}">'
+            f'<div style="display:flex;align-items:center;gap:6px;opacity:{opacity};'
+            f'padding:3px 0;">'
             f'{dot}'
-            f'<span style="font-size:11px;font-weight:600;color:#111827;flex:1;'
+            f'<span style="font-size:10.5px;font-weight:600;color:#111827;flex:1;'
             f'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{m["full_name"]}</span>'
-            f'<span style="{sty}font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;flex-shrink:0;">'
+            f'<span style="{sty}font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0;">'
             f'{label}</span></div>'
         )
     if not rows_html:
         rows_html = '<span style="font-size:10px;color:#9ca3af;">Sin integrantes</span>'
 
+    total_members = len(members)
     html = (
-        f'<p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Equipo</p>'
-        f'<h3 class="text-2xl font-black text-gray-900 mt-0.5">{online_count}</h3>'
-        f'<p class="text-[9px] text-[#16a34a] font-bold mt-0.5">● conectados ahora</p>'
+        # Header icono + titulo (replicado aqui porque hx-swap=innerHTML reemplaza TODO dentro del div)
+        f'<div style="display:flex;align-items:center;justify-content:space-between;">'
+        f'<span style="font-size:11px;font-weight:600;color:#6b7280;">Equipo</span>'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="1.8" opacity=".7">'
+        f'<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>'
+        f'</svg></div>'
+        # Numero grande
+        f'<div style="margin:8px 0 4px;">'
+        f'<h3 style="font-size:46px;font-weight:900;color:#16a34a;line-height:1;margin:0;">'
+        f'{online_count}</h3>'
+        f'<p style="font-size:10px;color:#9ca3af;margin:4px 0 0;font-weight:500;">'
+        f'de {total_members} conectados</p>'
+        f'</div>'
+        # Lista miembros compacta
+        f'<div style="display:flex;flex-direction:column;gap:1px;margin-top:6px;'
+        f'max-height:90px;overflow:hidden;">'
+        f'{rows_html}</div>'
     )
     return HTMLResponse(content=html)
 
