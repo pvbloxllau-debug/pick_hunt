@@ -382,12 +382,6 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </a>""" if is_supervisor else ''
 
         can_report = user['role'] in ('picker', 'supervisor')
-        mobile_center_btn = """
-            <button onclick="openReportModal()" class="bg-[#e11d48] text-white p-3.5 rounded-full shadow-lg shadow-rose-500/30 -mt-6 transform active:scale-95 transition" title="Reportar Faltante">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-            </button>""" if can_report else '<div class="w-14 h-14"></div>'
 
         bottom_nav = f"""
         <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg px-4 py-2 flex justify-around items-center z-40 pb-safe">
@@ -397,7 +391,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                 </svg>
                 <span class="text-[10px] font-bold">Busquedas</span>
             </a>
-            {mobile_center_btn}
+            {supervisor_link}
             <a href="/leaderboard" class="flex flex-col items-center gap-1 {'text-[#0053e2]' if active_tab == 'leaderboard' else 'text-gray-400'}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
