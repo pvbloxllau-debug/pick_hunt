@@ -989,7 +989,7 @@ def dashboard_get(request: Request):
         broadcast_panel = """
     <div style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:16px;padding:16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
         <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-            <span style="font-size:16px;">&#128276;</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#92400e" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             <span style="font-size:11px;font-weight:900;color:#92400e;text-transform:uppercase;letter-spacing:0.08em;">Notificar al equipo</span>
         </div>
         <input id="hunter-broadcast-text" type="text" maxlength="100"
