@@ -993,8 +993,9 @@ def dashboard_get(request: Request):
         <!-- Input + boton en fila -->
         <div style="display:flex;align-items:center;gap:8px;">
             <div style="flex:1;position:relative;">
-                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);
-                             pointer-events:none;line-height:0;">
+                <span style="position:absolute;left:10px;top:0;bottom:0;
+                             display:inline-flex;align-items:center;
+                             pointer-events:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                          viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -1061,8 +1062,9 @@ def dashboard_get(request: Request):
         <div style="display:flex;align-items:center;gap:8px;">
             <!-- Campo con icono mensaje adentro -->
             <div style="flex:1;position:relative;">
-                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);
-                             pointer-events:none;line-height:0;">
+                <span style="position:absolute;left:10px;top:0;bottom:0;
+                             display:inline-flex;align-items:center;
+                             pointer-events:none;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                          viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
