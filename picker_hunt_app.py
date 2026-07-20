@@ -510,7 +510,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
         <!-- MODAL: REPORTAR FALTANTE -->
         <div id="mobile-report-modal"
              style="position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;
-                    display:flex;align-items:flex-end;justify-content:center;"
+                    align-items:flex-end;justify-content:center;"
              class="hidden opacity-0 transition-opacity duration-300">
             <div style="background:#fff;width:100%;max-width:480px;
                         border-radius:24px 24px 0 0;padding:0;
@@ -910,7 +910,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             </div>
         </div>
 
-        <script src="/js/app.js?v=20" defer></script>
+        <script src="/js/app.js?v=21" defer></script>
     </body>
     </html>
     """

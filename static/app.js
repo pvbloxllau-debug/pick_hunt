@@ -218,6 +218,7 @@
         function openReportModal() {
             var modal = document.getElementById('mobile-report-modal');
             if (!modal) return;
+            modal.style.display = 'flex';
             modal.classList.remove('hidden');
             setTimeout(function() {
                 modal.classList.remove('opacity-0');
@@ -231,7 +232,10 @@
             modal.classList.add('opacity-0');
             var content = modal.firstElementChild;
             if (content) content.classList.add('translate-y-full');
-            setTimeout(function() { modal.classList.add('hidden'); }, 300);
+            setTimeout(function() {
+                modal.classList.add('hidden');
+                modal.style.display = '';
+            }, 300);
         }
         function submitReportModal(event) {
             if (event) event.preventDefault();
