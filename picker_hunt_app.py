@@ -993,9 +993,9 @@ def dashboard_get(request: Request):
         <!-- Input + boton en fila -->
         <div style="display:flex;align-items:center;gap:8px;">
             <div style="flex:1;position:relative;">
-                <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);
-                             pointer-events:none;display:flex;align-items:center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);
+                             pointer-events:none;line-height:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                          viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8 10h.01M12 10h.01M16 10h.01
@@ -1008,7 +1008,7 @@ def dashboard_get(request: Request):
                     placeholder="Que necesita saber el equipo? Ej: Llego pallet, quedar en zona transito."
                     style="width:100%;box-sizing:border-box;
                            border:1.5px solid #e5e7eb;border-radius:12px;
-                           padding:8px 12px 8px 30px;
+                           padding:8px 12px 8px 28px;
                            font-size:12px;color:#111827;outline:none;background:#f9fafb;
                            transition:border-color .2s,box-shadow .2s;"
                     onfocus="this.style.borderColor='#0053e2';
@@ -1061,9 +1061,9 @@ def dashboard_get(request: Request):
         <div style="display:flex;align-items:center;gap:8px;">
             <!-- Campo con icono mensaje adentro -->
             <div style="flex:1;position:relative;">
-                <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);
-                             pointer-events:none;display:flex;align-items:center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);
+                             pointer-events:none;line-height:0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none"
                          viewBox="0 0 24 24" stroke="#9ca3af" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8 10h.01M12 10h.01M16 10h.01
@@ -1076,7 +1076,7 @@ def dashboard_get(request: Request):
                     placeholder="Que necesita el equipo? Ej: Gondola A3 sin stock de leche."
                     style="width:100%;box-sizing:border-box;
                            border:1.5px solid #e5e7eb;border-radius:12px;
-                           padding:8px 12px 8px 30px;
+                           padding:8px 12px 8px 28px;
                            font-size:12px;color:#111827;outline:none;background:#f9fafb;
                            transition:border-color .2s,box-shadow .2s;"
                     onfocus="this.style.borderColor='#E67E00';
