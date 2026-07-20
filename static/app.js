@@ -196,14 +196,23 @@
             setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 8000);
         }
 
-        /* --- KPI live timestamp (actualiza 'hace X seg' en card Activas) --- */
+        /* --- KPI live timestamp — tiempo relativo en card Activas --- */
         window._kpiLastRefresh = Date.now();
+        function _relativeTime(ms) {
+            var sec = Math.round(ms / 1000);
+            if (sec < 10)  return '';
+            if (sec < 60)  return 'hace ' + sec + ' seg';
+            var min = Math.floor(sec / 60);
+            if (min < 60)  return 'hace ' + min + ' min';
+            var hrs = Math.floor(min / 60);
+            return 'hace ' + hrs + ' h';
+        }
         setInterval(function() {
             var el = document.getElementById('kpi-last-update');
             if (!el) return;
-            var sec = Math.round((Date.now() - window._kpiLastRefresh) / 1000);
-            el.textContent = sec < 5 ? '' : '· hace ' + sec + 's';
-        }, 3000);
+            var txt = _relativeTime(Date.now() - window._kpiLastRefresh);
+            el.textContent = txt ? '· ' + txt : '';
+        }, 5000);
 
         /* --- Report Modal --- */
         function openReportModal() {
