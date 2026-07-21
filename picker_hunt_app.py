@@ -1307,8 +1307,41 @@ def dashboard_get(request: Request):
     # Pre-render hunts server-side — no depende de JS ni HTMX para el primer render
     initial_hunts_html = _build_hunts_html(user)
 
-    # Render dashboard shell
-    dashboard_html = f"""
+    # ── KPI section: distinta por rol ────────────────────────────────────────
+    if user['role'] == 'picker':
+        muro_height     = '380px'
+        muro_height_md  = '540px'
+        kpi_section = f"""
+    <!-- PICKER: banner Categorias Foco horizontal -->
+    <div style="background:#fff;border-radius:16px;border:1px solid #f0f0f0;
+                box-shadow:0 2px 8px rgba(0,0,0,.05);padding:10px 14px;
+                border-left:4px solid #E67E00;
+                display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none"
+                 viewBox="0 0 24 24" stroke="#E67E00" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7
+                       a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7
+                       A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+            </svg>
+            <span style="font-size:10px;font-weight:700;color:#6b7280;white-space:nowrap;">Foco hoy</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <span style="background:#fff7ed;color:#c2410c;font-size:10px;font-weight:700;
+                         padding:4px 10px;border-radius:10px;border:1px solid #fed7aa;">Cafe</span>
+            <span style="background:#faf5ff;color:#7e22ce;font-size:10px;font-weight:700;
+                         padding:4px 10px;border-radius:10px;border:1px solid #e9d5ff;">Vinos</span>
+            <span style="background:#eff6ff;color:#1d4ed8;font-size:10px;font-weight:700;
+                         padding:4px 10px;border-radius:10px;border:1px solid #bfdbfe;">Checkout</span>
+            <span style="background:#f0fdf4;color:#15803d;font-size:10px;font-weight:700;
+                         padding:4px 10px;border-radius:10px;border:1px solid #bbf7d0;">Mascota</span>
+        </div>
+    </div>"""
+    else:
+        muro_height     = '240px'
+        muro_height_md  = '360px'
+        kpi_section = f"""
     <!-- TOP METRICS ROW -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-2">
 
@@ -1318,7 +1351,7 @@ def dashboard_get(request: Request):
                     border-left:4px solid #0053e2;display:flex;flex-direction:column;gap:4px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
                 <span style="font-size:10px;font-weight:600;color:#6b7280;">Activas</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-width="1.8" opacity=".7">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-h="1.8" opacity=".7">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
             </div>
@@ -1395,7 +1428,11 @@ def dashboard_get(request: Request):
             </div>
         </div>
 
-    </div>
+    </div>"""
+
+    # Render dashboard shell
+    dashboard_html = f"""
+    {kpi_section}
 
     {broadcast_panel}
 
@@ -1407,7 +1444,7 @@ def dashboard_get(request: Request):
             {alerta_btn}
 
             <!-- LIVE ACTIVITY WALL -->
-            <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col h-[240px] md:h-[360px]">
+            <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col" style="height:{muro_height};">
                 <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
                     <div class="flex items-center gap-2">
                         <span class="text-lg"></span>
