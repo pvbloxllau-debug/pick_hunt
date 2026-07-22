@@ -300,11 +300,26 @@ _WALMART_BADGE_HTML = (
     '</span>'
 )
 
+# Badge Picker: fondo amarillo Walmart, spark, texto blanco
+_WALMART_BADGE_PICKER_HTML = (
+    '<span style="background:#ffc220;color:white;font-weight:800;font-size:11px;'
+    'padding:4px 10px 4px 8px;border-radius:999px;'
+    'display:inline-flex;align-items:center;gap:6px;'
+    'box-shadow:0 1px 4px rgba(0,0,0,.20);">'
+    + _WALMART_SPARK_SVG
+    + '<span style="display:inline-block;width:1px;height:13px;'
+    'background:rgba(255,255,255,.50);flex-shrink:0;"></span>'
+    '<span style="letter-spacing:.02em;">Walmart</span>'
+    '</span>'
+)
+
 def _pts_badge(user: dict) -> str:
-    """Badge de puntos: logo Walmart para supervisores, estrella+pts para otros."""
+    """Badge: Walmart marino para supervisor, Walmart amarillo para picker, estrella+pts para hunter."""
     if user['role'] == 'supervisor':
         return _WALMART_BADGE_HTML
-    # Hunters y pickers: badge amarillo con estrella y puntos
+    if user['role'] == 'picker':
+        return _WALMART_BADGE_PICKER_HTML
+    # Hunters: badge amarillo con estrella y puntos
     return (
         f'<span style="background:#ffc220;color:#111827;font-weight:900;font-size:11px;'
         f'padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">'
