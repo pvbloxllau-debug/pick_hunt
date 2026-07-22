@@ -1391,90 +1391,84 @@ def dashboard_get(request: Request):
         muro_height     = '200px'
         muro_height_md  = '490px'
         kpi_section = f"""
-    <!-- KPI HUNTER: Cumplimiento hero + 3 compactos -->
-    <div class="grid grid-cols-3 lg:grid-cols-5 gap-1.5 mb-1 items-start">
+    <!-- TOP METRICS ROW (hunter ultracompact) -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-1.5 mb-1 items-start">
 
-        <!-- HERO: CUMPLIMIENTO (col-span-3 mobile / col-span-2 desktop) -->
-        <div class="col-span-3 lg:col-span-2"
-             style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
-                    box-shadow:0 1px 3px rgba(0,0,0,.04);
-                    border-left:5px solid {completitud_color};
-                    padding:8px 12px;
-                    display:flex;flex-direction:column;gap:2px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Cumplimiento del turno</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="{completitud_color}" stroke-width="2" opacity=".7">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div style="display:flex;align-items:baseline;gap:6px;">
-                <h3 style="font-size:32px;font-weight:900;color:{completitud_color};line-height:1;margin:0;
-                           transition:color .4s;">{completitud_pct}%</h3>
-                <span style="font-size:9px;color:#9ca3af;font-weight:500;">meta 96%</span>
-            </div>
-            <div style="background:#f3f4f6;border-radius:999px;height:4px;overflow:hidden;margin:2px 0;">
-                <div style="height:100%;width:{completitud_bar_w}%;background:{completitud_color};
-                            border-radius:999px;transition:width .6s ease;"></div>
-            </div>
-            <span style="font-size:7.5px;color:#9ca3af;font-weight:500;">{resolved_hunts} resueltos de {total_hunts} hoy</span>
-        </div>
-
-        <!-- COMPACT: ACTIVAS -->
+        <!-- CARD 1: ACTIVAS (azul) -->
         <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
                     box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
-                    border-left:3px solid #0053e2;display:flex;flex-direction:column;gap:1px;">
+                    border-left:4px solid #0053e2;display:flex;flex-direction:column;gap:1px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:7.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Activas</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-width="2" opacity=".6">
+                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Activas</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-width="2" opacity=".6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
             </div>
             <h3 id="metric-active-hunts"
-                style="font-size:18px;font-weight:900;color:#0053e2;line-height:1;margin:1px 0 0;
+                style="font-size:22px;font-weight:900;color:#0053e2;line-height:1;margin:0;
                        transition:transform .2s;">...</h3>
-            <div style="display:flex;align-items:center;gap:2px;margin-top:1px;">
+            <div style="display:flex;align-items:center;gap:3px;margin-top:1px;">
                 <span style="width:4px;height:4px;border-radius:50%;background:#16a34a;
                              animation:pulse 1.5s infinite;flex-shrink:0;"></span>
-                <span style="font-size:7px;color:#16a34a;font-weight:600;">En vivo</span>
-                <span id="kpi-last-update" style="font-size:7px;color:#9ca3af;margin-left:1px;"></span>
+                <span style="font-size:7.5px;color:#16a34a;font-weight:600;">En vivo</span>
+                <span id="kpi-last-update" style="font-size:7.5px;color:#9ca3af;margin-left:1px;"></span>
             </div>
         </div>
 
-        <!-- COMPACT: EQUIPO -->
+        <!-- CARD 2: EQUIPO (verde) -->
         <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
                     box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
-                    border-left:3px solid #16a34a;"
+                    border-left:4px solid #16a34a;"
              hx-get="/api/equipo-online"
              hx-trigger="load, every 10s"
              hx-swap="innerHTML">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:7.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Equipo</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2" opacity=".6">
+                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Equipo</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2" opacity=".6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
             <p style="font-size:7.5px;color:#9ca3af;margin:2px 0 0;">Cargando...</p>
         </div>
 
-        <!-- COMPACT: FOCO HOY -->
+        <!-- CARD 3: CUMPLIMIENTO (dinamico) -->
         <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
                     box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
-                    border-left:3px solid #E67E00;display:flex;flex-direction:column;gap:3px;">
+                    border-left:4px solid {completitud_color};display:flex;flex-direction:column;gap:1px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:7.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Foco</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#E67E00" stroke-width="2" opacity=".6">
+                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Cumplimiento</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="{completitud_color}" stroke-width="2" opacity=".6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <h3 style="font-size:22px;font-weight:900;color:{completitud_color};line-height:1;margin:0;
+                       transition:color .4s;">{completitud_pct}%</h3>
+            <p style="font-size:7.5px;color:#9ca3af;font-weight:500;">{resolved_hunts}/{total_hunts} &middot; meta 96%</p>
+            <div style="background:#f3f4f6;border-radius:999px;height:2px;overflow:hidden;margin-top:1px;">
+                <div style="height:100%;width:{completitud_bar_w}%;background:{completitud_color};
+                            border-radius:999px;transition:width .6s ease;"></div>
+            </div>
+        </div>
+
+        <!-- CARD 4: FOCO HOY (naranja) -->
+        <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
+                    box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
+                    border-left:4px solid #E67E00;display:flex;flex-direction:column;gap:3px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Foco hoy</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#E67E00" stroke-width="2" opacity=".6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                 </svg>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:2px;">
-                <span style="background:#fff7ed;color:#c2410c;font-size:7.5px;font-weight:700;
-                             padding:1px 4px;border-radius:5px;border:1px solid #fed7aa;">Cafe</span>
-                <span style="background:#faf5ff;color:#7e22ce;font-size:7.5px;font-weight:700;
-                             padding:1px 4px;border-radius:5px;border:1px solid #e9d5ff;">Vinos</span>
-                <span style="background:#eff6ff;color:#1d4ed8;font-size:7.5px;font-weight:700;
-                             padding:1px 4px;border-radius:5px;border:1px solid #bfdbfe;">Checkout</span>
-                <span style="background:#f0fdf4;color:#15803d;font-size:7.5px;font-weight:700;
-                             padding:1px 4px;border-radius:5px;border:1px solid #bbf7d0;">Mascota</span>
+                <span style="background:#fff7ed;color:#c2410c;font-size:8px;font-weight:700;
+                             padding:1px 5px;border-radius:6px;border:1px solid #fed7aa;">Cafe</span>
+                <span style="background:#faf5ff;color:#7e22ce;font-size:8px;font-weight:700;
+                             padding:1px 5px;border-radius:6px;border:1px solid #e9d5ff;">Vinos</span>
+                <span style="background:#eff6ff;color:#1d4ed8;font-size:8px;font-weight:700;
+                             padding:1px 5px;border-radius:6px;border:1px solid #bfdbfe;">Checkout</span>
+                <span style="background:#f0fdf4;color:#15803d;font-size:8px;font-weight:700;
+                             padding:1px 5px;border-radius:6px;border:1px solid #bbf7d0;">Mascota</span>
             </div>
         </div>
 
