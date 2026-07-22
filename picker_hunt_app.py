@@ -1701,6 +1701,29 @@ def leaderboard_get(request: Request):
     if not picker_rows:
         picker_rows = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#9ca3af;font-size:12px;">Sin datos aun</td></tr>'
 
+    # Desempeño pickers solo visible para supervisor
+    picker_section_html = ''
+    if user['role'] == 'supervisor':
+        picker_section_html = f"""
+        <!-- PICKERS -->
+        <div style="background:white;border-radius:20px;border:1px solid #e5e7eb;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+            <div style="background:#ea580c;padding:20px 24px;">
+                <h2 style="color:white;font-size:16px;font-weight:900;">&#128269; Desempeno Pickers</h2>
+                <p style="color:rgba(255,255,255,.65);font-size:11px;margin-top:2px;">Evaluacion basada en el resultado que reporta el Hunter &mdash; no en volumen de casos</p>
+            </div>
+            <table style="width:100%;border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#f9fafb;border-bottom:1px solid #f3f4f6;">
+                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:center;">#</th>
+                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:left;">Picker</th>
+                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:left;">KPIs</th>
+                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:right;">Acierto</th>
+                    </tr>
+                </thead>
+                <tbody>{picker_rows}</tbody>
+            </table>
+        </div>"""
+
     leaderboard_html = f"""
     <div class="max-w-4xl mx-auto space-y-6">
 
@@ -1726,24 +1749,7 @@ def leaderboard_get(request: Request):
             </table>
         </div>
 
-        <!-- PICKERS -->
-        <div style="background:white;border-radius:20px;border:1px solid #e5e7eb;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);">
-            <div style="background:#ea580c;padding:20px 24px;">
-                <h2 style="color:white;font-size:16px;font-weight:900;">&#128269; Desempeno Pickers</h2>
-                <p style="color:rgba(255,255,255,.65);font-size:11px;margin-top:2px;">Evaluacion basada en el resultado que reporta el Hunter &mdash; no en volumen de casos</p>
-            </div>
-            <table style="width:100%;border-collapse:collapse;">
-                <thead>
-                    <tr style="background:#f9fafb;border-bottom:1px solid #f3f4f6;">
-                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:center;">#</th>
-                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:left;">Picker</th>
-                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:left;">KPIs</th>
-                        <th style="padding:8px 12px;font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;text-align:right;">Acierto</th>
-                    </tr>
-                </thead>
-                <tbody>{picker_rows}</tbody>
-            </table>
-        </div>
+        {picker_section_html}
 
     </div>
     """
