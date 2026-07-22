@@ -1392,7 +1392,7 @@ def dashboard_get(request: Request):
         muro_height_md  = '490px'
         kpi_section = f"""
     <!-- TOP METRICS ROW (hunter ultracompact) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-1.5 mb-1">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-1.5 mb-1 items-start">
 
         <!-- CARD 1: ACTIVAS (azul) -->
         <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
