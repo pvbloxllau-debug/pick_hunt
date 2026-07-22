@@ -518,13 +518,13 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                 0%,100% { box-shadow:0 0 0 0 rgba(252,165,165,.6); }
                 50%     { box-shadow:0 0 0 12px rgba(252,165,165,0); }
             }
-            @keyframes feedPulse {
-                0%, 100% { background:rgba(0,83,226,0.12); box-shadow:0 0 0 0 rgba(0,83,226,0.25); }
-                50%       { background:rgba(0,83,226,0.22); box-shadow:0 0 0 6px rgba(0,83,226,0);  }
+            @keyframes feedPulseSup {
+                0%, 100% { box-shadow:0 0 0 0 rgba(0,83,226,0.30), inset 3px 0 0 #0053e2; }
+                50%       { box-shadow:0 0 10px 3px rgba(0,83,226,0.18), inset 3px 0 0 #0053e2; }
             }
             @keyframes feedPulseHunter {
-                0%, 100% { background:rgba(234,179,8,0.10); }
-                50%       { background:rgba(234,179,8,0.20); }
+                0%, 100% { box-shadow:0 0 0 0 rgba(230,126,0,0.30), inset 3px 0 0 #E67E00; }
+                50%       { box-shadow:0 0 10px 3px rgba(230,126,0,0.18), inset 3px 0 0 #E67E00; }
             }
         </style>
     </head>
@@ -1875,17 +1875,68 @@ def api_feed(request: Request):
         is_sup  = item['is_supervisor']
 
         if is_sup:
-            card_style = 'style="background:rgba(0,83,226,0.12);border:1px solid transparent;border-radius:12px;padding:10px;animation:feedPulse 2.5s ease-in-out infinite;"'
-            text_style = 'style="font-size:11px;color:#003fa3;font-weight:700;line-height:1.5;"'
-            label_html = '<span style="font-size:8px;font-weight:900;color:#0053e2;text-transform:uppercase;letter-spacing:0.1em;"> Supervisor</span>'
+            card_style = (
+                'style="'
+                'background:linear-gradient(135deg,rgba(0,83,226,0.08) 0%,rgba(0,83,226,0.03) 100%);'
+                'border:1px solid rgba(0,83,226,0.18);'
+                'border-left:4px solid #0053e2;'
+                'border-radius:10px;'
+                'padding:10px 12px;'
+                'animation:feedPulseSup 3s ease-in-out infinite;'
+                '"'
+            )
+            text_style = 'style="font-size:11px;color:#1e3a8a;font-weight:600;line-height:1.55;"'
+            label_html = (
+                '<span style="'
+                'display:inline-flex;align-items:center;gap:4px;'
+                'margin-top:5px;'
+                'background:#0053e2;color:white;'
+                'font-size:8px;font-weight:900;'
+                'text-transform:uppercase;letter-spacing:0.09em;'
+                'padding:2px 7px;border-radius:999px;'
+                '">'
+                '<svg width="8" height="8" viewBox="0 0 10 10" fill="white">'
+                '<polygon points="5,1 6.2,4 9.5,4 6.9,6.2 7.9,9.5 5,7.5 2.1,9.5 3.1,6.2 0.5,4 3.8,4"/>'
+                '</svg>'
+                ' Supervisor</span>'
+            )
         elif item['is_hunter']:
-            card_style = 'style="background:rgba(234,179,8,0.10);border:1px solid transparent;border-radius:12px;padding:10px;animation:feedPulseHunter 2.5s ease-in-out infinite;"'
-            text_style = 'style="font-size:11px;color:#78350f;font-weight:700;line-height:1.5;"'
-            label_html = '<span style="font-size:8px;font-weight:900;color:#d97706;text-transform:uppercase;letter-spacing:0.1em;"> Hunter</span>'
+            card_style = (
+                'style="'
+                'background:linear-gradient(135deg,rgba(230,126,0,0.09) 0%,rgba(230,126,0,0.03) 100%);'
+                'border:1px solid rgba(230,126,0,0.20);'
+                'border-left:4px solid #E67E00;'
+                'border-radius:10px;'
+                'padding:10px 12px;'
+                'animation:feedPulseHunter 3s ease-in-out infinite;'
+                '"'
+            )
+            text_style = 'style="font-size:11px;color:#7c2d12;font-weight:600;line-height:1.55;"'
+            label_html = (
+                '<span style="'
+                'display:inline-flex;align-items:center;gap:4px;'
+                'margin-top:5px;'
+                'background:#E67E00;color:white;'
+                'font-size:8px;font-weight:900;'
+                'text-transform:uppercase;letter-spacing:0.09em;'
+                'padding:2px 7px;border-radius:999px;'
+                '">'
+                '<svg width="8" height="8" viewBox="0 0 10 10" fill="white">'
+                '<circle cx="5" cy="5" r="4"/>'
+                '</svg>'
+                ' Hunter</span>'
+            )
         else:
-            card_style = 'style="background:#f9fafb;border:1px solid #f3f4f6;border-radius:12px;padding:10px;"'
-            text_style = 'style="font-size:11px;color:#374151;font-weight:500;line-height:1.5;"'
-            label_html = '<span style="font-size:8px;color:#9ca3af;">Hace unos instantes</span>'
+            card_style = (
+                'style="'
+                'background:#f9fafb;'
+                'border:1px solid #f0f0f0;'
+                'border-radius:10px;'
+                'padding:10px 12px;'
+                '"'
+            )
+            text_style = 'style="font-size:11px;color:#374151;font-weight:500;line-height:1.55;"'
+            label_html = '<span style="font-size:8px;color:#9ca3af;display:block;margin-top:4px;">Hace unos instantes</span>'
 
         # Boton editar solo para supervisor viendo sus propios mensajes
         edit_btn = ''
