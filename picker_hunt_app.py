@@ -381,24 +381,13 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                 <span class="text-[10px] font-bold">Usuarios</span>
             </a>""" if is_supervisor else ''
 
-        can_report = user['role'] in ('picker', 'supervisor')
-
-        bottom_nav = f"""
-        <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg px-4 py-2 flex justify-around items-center z-40 pb-safe">
-            <a href="/dashboard" class="flex flex-col items-center gap-1 {'text-[#0053e2]' if active_tab == 'dashboard' else 'text-gray-400'}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <span class="text-[10px] font-bold">Busquedas</span>
-            </a>
-            {admin_tab_mobile}
-            {'f\'\'\'\'' if user["role"] != "picker" else '''
+        picker_alerta_nav = """
             <button onclick="openReportModal()"
                     style="display:flex;flex-direction:column;align-items:center;gap:2px;
                            background:linear-gradient(145deg,#d13438,#a52b2e);
                            border:none;border-radius:14px;padding:6px 18px;
                            cursor:pointer;box-shadow:0 3px 10px rgba(209,52,56,.35);
-                           transition:transform .12s,filter .12s;"
+                           transition:transform .12s;"
                     onmousedown="this.style.transform='scale(.94)'"
                     onmouseup="this.style.transform=''">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
@@ -411,20 +400,35 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                            L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
                 <span style="font-size:9px;font-weight:700;color:white;">Alerta</span>
-            </button>'''}
-            {'""' if user["role"] == "picker" else f'''
-            <a href="/leaderboard" class="flex flex-col items-center gap-1 {"text-[#0053e2]" if active_tab == "leaderboard" else "text-gray-400"}">
+            </button>""" if user['role'] == 'picker' else ''
+
+        ranking_stats_nav = f"""
+            <a href="/leaderboard" class="flex flex-col items-center gap-1 {'text-[#0053e2]' if active_tab == 'leaderboard' else 'text-gray-400'}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
                 <span class="text-[10px] font-bold">Ranking</span>
             </a>
-            <a href="/stats" class="flex flex-col items-center gap-1 {"text-[#0053e2]" if active_tab == "stats" else "text-gray-400"}">
+            <a href="/stats" class="flex flex-col items-center gap-1 {'text-[#0053e2]' if active_tab == 'stats' else 'text-gray-400'}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 <span class="text-[10px] font-bold">Metricas</span>
-            </a>'''}
+            </a>""" if user['role'] != 'picker' else ''
+
+        can_report = user['role'] in ('picker', 'supervisor')
+
+        bottom_nav = f"""
+        <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg px-4 py-2 flex justify-around items-center z-40 pb-safe">
+            <a href="/dashboard" class="flex flex-col items-center gap-1 {'text-[#0053e2]' if active_tab == 'dashboard' else 'text-gray-400'}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <span class="text-[10px] font-bold">Busquedas</span>
+            </a>
+            {admin_tab_mobile}
+            {picker_alerta_nav}
+            {ranking_stats_nav}
         </div>
         """
 
