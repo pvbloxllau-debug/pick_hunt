@@ -392,6 +392,26 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                 <span class="text-[10px] font-bold">Busquedas</span>
             </a>
             {admin_tab_mobile}
+            {'f\'\'\'\'' if user["role"] != "picker" else '''
+            <button onclick="openReportModal()"
+                    style="display:flex;flex-direction:column;align-items:center;gap:2px;
+                           background:linear-gradient(145deg,#d13438,#a52b2e);
+                           border:none;border-radius:14px;padding:6px 18px;
+                           cursor:pointer;box-shadow:0 3px 10px rgba(209,52,56,.35);
+                           transition:transform .12s,filter .12s;"
+                    onmousedown="this.style.transform='scale(.94)'"
+                    onmouseup="this.style.transform=''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none"
+                     viewBox="0 0 24 24" stroke="white" stroke-width="2"
+                     style="animation:pulse 2s ease-in-out infinite;">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11
+                           a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341
+                           C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436
+                           L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span style="font-size:9px;font-weight:700;color:white;">Alerta</span>
+            </button>'''}
             {'""' if user["role"] == "picker" else f'''
             <a href="/leaderboard" class="flex flex-col items-center gap-1 {"text-[#0053e2]" if active_tab == "leaderboard" else "text-gray-400"}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
