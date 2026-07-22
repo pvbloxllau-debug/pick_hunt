@@ -287,6 +287,20 @@ _WALMART_SPARK_SVG = (
     '</g></svg>'
 )
 
+# Spark Walmart blanco (para badge sobre fondo amarillo)
+_WALMART_SPARK_WHITE_SVG = (
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" '
+    'width="16" height="16" style="display:inline-block;vertical-align:middle;flex-shrink:0;">'
+    '<g transform="translate(50,50)">'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="white"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="white" transform="rotate(60)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="white" transform="rotate(120)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="white" transform="rotate(180)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="white" transform="rotate(240)"/>'
+    '<rect x="-7" y="-45" width="14" height="30" rx="7" fill="white" transform="rotate(300)"/>'
+    '</g></svg>'
+)
+
 # Badge completo estilo logo oficial Walmart (marino oscuro, spark, divisor, texto blanco)
 _WALMART_BADGE_HTML = (
     '<span style="background:#0a1628;color:white;font-weight:800;font-size:11px;'
@@ -300,13 +314,13 @@ _WALMART_BADGE_HTML = (
     '</span>'
 )
 
-# Badge Picker: fondo amarillo Walmart, spark, texto blanco
+# Badge Picker: fondo amarillo Walmart, spark blanco, texto blanco
 _WALMART_BADGE_PICKER_HTML = (
     '<span style="background:#ffc220;color:white;font-weight:800;font-size:11px;'
     'padding:4px 10px 4px 8px;border-radius:999px;'
     'display:inline-flex;align-items:center;gap:6px;'
     'box-shadow:0 1px 4px rgba(0,0,0,.20);">'
-    + _WALMART_SPARK_SVG
+    + _WALMART_SPARK_WHITE_SVG
     + '<span style="display:inline-block;width:1px;height:13px;'
     'background:rgba(255,255,255,.50);flex-shrink:0;"></span>'
     '<span style="letter-spacing:.02em;">Walmart</span>'
