@@ -1309,7 +1309,7 @@ def dashboard_get(request: Request):
 
     # ── KPI section: distinta por rol ────────────────────────────────────────
     if user['role'] == 'picker':
-        muro_height     = '380px'
+        muro_height     = '200px'
         muro_height_md  = '540px'
         kpi_section = f"""
     <!-- PICKER: banner Categorias Foco horizontal -->
