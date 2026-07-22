@@ -314,9 +314,9 @@ _WALMART_BADGE_HTML = (
     '</span>'
 )
 
-# Badge Picker: fondo amarillo Walmart, spark blanco, texto blanco
-_WALMART_BADGE_PICKER_HTML = (
-    '<span style="background:#ffc220;color:white;font-weight:800;font-size:11px;'
+# Badge Hunter: fondo naranja, spark blanco, texto blanco
+_WALMART_BADGE_HUNTER_HTML = (
+    '<span style="background:#E67E00;color:white;font-weight:800;font-size:11px;'
     'padding:4px 10px 4px 8px;border-radius:999px;'
     'display:inline-flex;align-items:center;gap:6px;'
     'box-shadow:0 1px 4px rgba(0,0,0,.20);">'
@@ -328,17 +328,12 @@ _WALMART_BADGE_PICKER_HTML = (
 )
 
 def _pts_badge(user: dict) -> str:
-    """Badge: Walmart marino para supervisor, Walmart amarillo para picker, estrella+pts para hunter."""
+    """Badge Walmart por rol: marino=supervisor, amarillo=picker, naranja=hunter."""
     if user['role'] == 'supervisor':
         return _WALMART_BADGE_HTML
     if user['role'] == 'picker':
         return _WALMART_BADGE_PICKER_HTML
-    # Hunters: badge amarillo con estrella y puntos
-    return (
-        f'<span style="background:#ffc220;color:#111827;font-weight:900;font-size:11px;'
-        f'padding:3px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;">'
-        f'&#11088; {user["points"]} pts</span>'
-    )
+    return _WALMART_BADGE_HUNTER_HTML
 
 
 # Helper template renderer to keep the code fully responsive & gorgeous
