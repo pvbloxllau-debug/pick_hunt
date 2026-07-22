@@ -1475,13 +1475,30 @@ def dashboard_get(request: Request):
     </div>"""
 
     # Render dashboard shell
-    # Hunter: Busquedas primero (area de trabajo principal), Muro despues
     if user['role'] == 'hunter':
         main_grid = f"""
-    <!-- HUNTER MAIN GRID: Busquedas (2 cols) | Muro (1 col) -->
+    <!-- HUNTER MAIN GRID: Muro (1 col) | Busquedas (2 cols) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
 
-        <!-- BUSQUEDAS DEL DIA (prioridad operativa) -->
+        <!-- MURO ACTIVIDAD (primero en DOM = primero en mobile) -->
+        <div class="lg:col-span-1 space-y-2">
+            {alerta_btn}
+            <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col" style="height:{muro_height};">
+                <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base"></span>
+                        <h2 class="text-xs font-black text-gray-900">Muro de Actividad</h2>
+                    </div>
+                    <span class="bg-blue-50 text-[#0053e2] font-black text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">En Vivo</span>
+                </div>
+                <div id="feed-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-1 pr-1"
+                     hx-get="/api/feed" hx-trigger="load, reload-feed" hx-swap="innerHTML">
+                    <div class="text-center py-4 text-gray-400 text-xs">Cargando actividad...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSQUEDAS DEL DIA -->
         <div class="lg:col-span-2 space-y-2">
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm" style="padding:14px 16px;">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
@@ -1497,24 +1514,6 @@ def dashboard_get(request: Request):
                 </div>
                 <div id="hunts-container" class="space-y-2">
                     {initial_hunts_html}
-                </div>
-            </div>
-        </div>
-
-        <!-- MURO ACTIVIDAD (referencia secundaria) -->
-        <div class="lg:col-span-1 space-y-2">
-            {alerta_btn}
-            <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col" style="height:{muro_height};">
-                <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
-                    <div class="flex items-center gap-2">
-                        <span class="text-base"></span>
-                        <h2 class="text-xs font-black text-gray-900">Muro de Actividad</h2>
-                    </div>
-                    <span class="bg-blue-50 text-[#0053e2] font-black text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">En Vivo</span>
-                </div>
-                <div id="feed-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-1 pr-1"
-                     hx-get="/api/feed" hx-trigger="load, reload-feed" hx-swap="innerHTML">
-                    <div class="text-center py-4 text-gray-400 text-xs">Cargando actividad...</div>
                 </div>
             </div>
         </div>
