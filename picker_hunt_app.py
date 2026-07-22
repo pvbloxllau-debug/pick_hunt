@@ -1388,106 +1388,152 @@ def dashboard_get(request: Request):
         </div>
     </div>"""
     else:
-        muro_height     = '180px'
+        muro_height     = '200px'
         muro_height_md  = '490px'
         kpi_section = f"""
-    <!-- TOP METRICS ROW (hunter ultracompact) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-1.5 mb-1 items-start">
+    <!-- KPI HUNTER: Cumplimiento hero + 3 compactos -->
+    <div class="grid grid-cols-3 lg:grid-cols-5 gap-1.5 mb-1 items-start">
 
-        <!-- CARD 1: ACTIVAS (azul) -->
+        <!-- HERO: CUMPLIMIENTO (col-span-3 mobile / col-span-2 desktop) -->
+        <div class="col-span-3 lg:col-span-2"
+             style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
+                    box-shadow:0 1px 3px rgba(0,0,0,.04);
+                    border-left:5px solid {completitud_color};
+                    padding:8px 12px;
+                    display:flex;flex-direction:column;gap:2px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Cumplimiento del turno</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="{completitud_color}" stroke-width="2" opacity=".7">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:6px;">
+                <h3 style="font-size:32px;font-weight:900;color:{completitud_color};line-height:1;margin:0;
+                           transition:color .4s;">{completitud_pct}%</h3>
+                <span style="font-size:9px;color:#9ca3af;font-weight:500;">meta 96%</span>
+            </div>
+            <div style="background:#f3f4f6;border-radius:999px;height:4px;overflow:hidden;margin:2px 0;">
+                <div style="height:100%;width:{completitud_bar_w}%;background:{completitud_color};
+                            border-radius:999px;transition:width .6s ease;"></div>
+            </div>
+            <span style="font-size:7.5px;color:#9ca3af;font-weight:500;">{resolved_hunts} resueltos de {total_hunts} hoy</span>
+        </div>
+
+        <!-- COMPACT: ACTIVAS -->
         <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
                     box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
-                    border-left:4px solid #0053e2;display:flex;flex-direction:column;gap:1px;">
+                    border-left:3px solid #0053e2;display:flex;flex-direction:column;gap:1px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Activas</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-width="2" opacity=".6">
+                <span style="font-size:7.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Activas</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#0053e2" stroke-width="2" opacity=".6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
             </div>
             <h3 id="metric-active-hunts"
-                style="font-size:22px;font-weight:900;color:#0053e2;line-height:1;margin:0;
+                style="font-size:18px;font-weight:900;color:#0053e2;line-height:1;margin:1px 0 0;
                        transition:transform .2s;">...</h3>
-            <div style="display:flex;align-items:center;gap:3px;">
+            <div style="display:flex;align-items:center;gap:2px;margin-top:1px;">
                 <span style="width:4px;height:4px;border-radius:50%;background:#16a34a;
                              animation:pulse 1.5s infinite;flex-shrink:0;"></span>
-                <span style="font-size:7.5px;color:#16a34a;font-weight:600;">En vivo</span>
-                <span id="kpi-last-update" style="font-size:7.5px;color:#9ca3af;margin-left:1px;"></span>
+                <span style="font-size:7px;color:#16a34a;font-weight:600;">En vivo</span>
+                <span id="kpi-last-update" style="font-size:7px;color:#9ca3af;margin-left:1px;"></span>
             </div>
         </div>
 
-        <!-- CARD 2: EQUIPO (verde) -->
+        <!-- COMPACT: EQUIPO -->
         <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
                     box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
-                    border-left:4px solid #16a34a;"
+                    border-left:3px solid #16a34a;"
              hx-get="/api/equipo-online"
              hx-trigger="load, every 10s"
              hx-swap="innerHTML">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Equipo</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2" opacity=".6">
+                <span style="font-size:7.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Equipo</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2" opacity=".6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
-            <p style="font-size:8px;color:#9ca3af;margin:2px 0 0;">Cargando...</p>
+            <p style="font-size:7.5px;color:#9ca3af;margin:2px 0 0;">Cargando...</p>
         </div>
 
-        <!-- CARD 3: CUMPLIMIENTO (dinamico) -->
+        <!-- COMPACT: FOCO HOY -->
         <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
                     box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
-                    border-left:4px solid {completitud_color};display:flex;flex-direction:column;gap:1px;">
+                    border-left:3px solid #E67E00;display:flex;flex-direction:column;gap:3px;">
             <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Cumplimiento</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="{completitud_color}" stroke-width="2" opacity=".6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <h3 style="font-size:22px;font-weight:900;color:{completitud_color};line-height:1;margin:0;
-                       transition:color .4s;">{completitud_pct}%</h3>
-            <p style="font-size:7.5px;color:#9ca3af;font-weight:500;">{resolved_hunts}/{total_hunts} &middot; meta 96%</p>
-            <div style="background:#f3f4f6;border-radius:999px;height:2px;overflow:hidden;margin-top:1px;">
-                <div style="height:100%;width:{completitud_bar_w}%;background:{completitud_color};
-                            border-radius:999px;transition:width .6s ease;"></div>
-            </div>
-        </div>
-
-        <!-- CARD 4: FOCO (naranja) -->
-        <div style="background:#fff;border-radius:12px;border:1px solid #f0f0f0;
-                    box-shadow:0 1px 3px rgba(0,0,0,.04);padding:6px 8px;
-                    border-left:4px solid #E67E00;display:flex;flex-direction:column;gap:3px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Foco hoy</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#E67E00" stroke-width="2" opacity=".6">
+                <span style="font-size:7.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Foco</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#E67E00" stroke-width="2" opacity=".6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                 </svg>
             </div>
             <div style="display:flex;flex-wrap:wrap;gap:2px;">
-                <span style="background:#fff7ed;color:#c2410c;font-size:8px;font-weight:700;
-                             padding:1px 5px;border-radius:6px;border:1px solid #fed7aa;">Cafe</span>
-                <span style="background:#faf5ff;color:#7e22ce;font-size:8px;font-weight:700;
-                             padding:1px 5px;border-radius:6px;border:1px solid #e9d5ff;">Vinos</span>
-                <span style="background:#eff6ff;color:#1d4ed8;font-size:8px;font-weight:700;
-                             padding:1px 5px;border-radius:6px;border:1px solid #bfdbfe;">Checkout</span>
-                <span style="background:#f0fdf4;color:#15803d;font-size:8px;font-weight:700;
-                             padding:1px 5px;border-radius:6px;border:1px solid #bbf7d0;">Mascota</span>
+                <span style="background:#fff7ed;color:#c2410c;font-size:7.5px;font-weight:700;
+                             padding:1px 4px;border-radius:5px;border:1px solid #fed7aa;">Cafe</span>
+                <span style="background:#faf5ff;color:#7e22ce;font-size:7.5px;font-weight:700;
+                             padding:1px 4px;border-radius:5px;border:1px solid #e9d5ff;">Vinos</span>
+                <span style="background:#eff6ff;color:#1d4ed8;font-size:7.5px;font-weight:700;
+                             padding:1px 4px;border-radius:5px;border:1px solid #bfdbfe;">Checkout</span>
+                <span style="background:#f0fdf4;color:#15803d;font-size:7.5px;font-weight:700;
+                             padding:1px 4px;border-radius:5px;border:1px solid #bbf7d0;">Mascota</span>
             </div>
         </div>
 
     </div>"""
 
     # Render dashboard shell
-    dashboard_html = f"""
-    {kpi_section}
+    # Hunter: Busquedas primero (area de trabajo principal), Muro despues
+    if user['role'] == 'hunter':
+        main_grid = f"""
+    <!-- HUNTER MAIN GRID: Busquedas (2 cols) | Muro (1 col) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
 
-    {broadcast_panel}
+        <!-- BUSQUEDAS DEL DIA (prioridad operativa) -->
+        <div class="lg:col-span-2 space-y-2">
+            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm" style="padding:14px 16px;">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-3">
+                    <div>
+                        <h2 class="text-sm font-black text-gray-900">Busquedas del Dia <span id="js-alive" style="font-size:9px;font-weight:400;color:#9ca3af;">JS...</span></h2>
+                        <p class="text-[10px] text-gray-500 mt-0.5">Reportes activos que requieren stock en gondola</p>
+                    </div>
+                    <div class="w-full sm:w-auto">
+                        <input id="search-input" type="text" name="search" placeholder=" Buscar por item o descripcion..."
+                               class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#0053e2]"
+                               oninput="loadHunts(this.value)" />
+                    </div>
+                </div>
+                <div id="hunts-container" class="space-y-2">
+                    {initial_hunts_html}
+                </div>
+            </div>
+        </div>
 
-    <!-- MAIN INTERACTIVE SECTION -->
+        <!-- MURO ACTIVIDAD (referencia secundaria) -->
+        <div class="lg:col-span-1 space-y-2">
+            {alerta_btn}
+            <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col" style="height:{muro_height};">
+                <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base"></span>
+                        <h2 class="text-xs font-black text-gray-900">Muro de Actividad</h2>
+                    </div>
+                    <span class="bg-blue-50 text-[#0053e2] font-black text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">En Vivo</span>
+                </div>
+                <div id="feed-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-1 pr-1"
+                     hx-get="/api/feed" hx-trigger="load, reload-feed" hx-swap="innerHTML">
+                    <div class="text-center py-4 text-gray-400 text-xs">Cargando actividad...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>"""
+    else:
+        main_grid = f"""
+    <!-- MAIN INTERACTIVE SECTION (picker / supervisor) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        
+
         <!-- COLUMN 1: REPORT & LIVE FEEDS -->
         <div class="space-y-3 lg:col-span-1">
             {alerta_btn}
-
-            <!-- LIVE ACTIVITY WALL -->
             <div class="bg-white rounded-2xl border border-gray-200 p-3 shadow-sm flex flex-col" style="height:{muro_height};">
                 <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-gray-100">
                     <div class="flex items-center gap-2">
@@ -1496,7 +1542,6 @@ def dashboard_get(request: Request):
                     </div>
                     <span class="bg-blue-50 text-[#0053e2] font-black text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">En Vivo</span>
                 </div>
-                
                 <div id="feed-container" class="flex-1 overflow-y-auto custom-scrollbar space-y-1 pr-1"
                      hx-get="/api/feed" hx-trigger="load, reload-feed" hx-swap="innerHTML">
                     <div class="text-center py-4 text-gray-400 text-xs">Cargando actividad...</div>
@@ -1507,27 +1552,30 @@ def dashboard_get(request: Request):
         <!-- COLUMN 2 & 3: ACTIVE HUNTS LIST -->
         <div class="lg:col-span-2 space-y-3">
             <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
-                <!-- Search & Filter bar -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                     <div>
                         <h2 class="text-sm font-black text-gray-900">Busquedas del Dia <span id="js-alive" style="font-size:9px;font-weight:400;color:#9ca3af;">JS...</span></h2>
                         <p class="text-[10px] text-gray-500 mt-0.5">Reportes activos que requieren stock en gondola</p>
                     </div>
-                    
                     <div class="w-full sm:w-auto">
                         <input id="search-input" type="text" name="search" placeholder=" Buscar por item o descripcion..."
                                class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#0053e2]"
                                oninput="loadHunts(this.value)" />
                     </div>
                 </div>
-
-                <!-- Hunts Container -->
                 <div id="hunts-container" class="space-y-3">
                     {initial_hunts_html}
                 </div>
             </div>
         </div>
-    </div>
+    </div>"""
+
+    dashboard_html = f"""
+    {kpi_section}
+
+    {broadcast_panel}
+
+    {main_grid}
     """
     return HTMLResponse(content=render_template(dashboard_html, user=user, active_tab="dashboard"))
 
@@ -1998,13 +2046,13 @@ def api_equipo_online(request: Request):
     total_members = len(members)
     html = (
         f'<div style="display:flex;align-items:center;justify-content:space-between;">'
-        f'<span style="font-size:8px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">Equipo</span>'
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2" opacity=".6">'
+        f'<span style="font-size:7.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Equipo</span>'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2" opacity=".6">'
         f'<path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>'
         f'</svg></div>'
-        f'<h3 style="font-size:22px;font-weight:900;color:#16a34a;line-height:1;margin:1px 0 0;">'
+        f'<h3 style="font-size:18px;font-weight:900;color:#16a34a;line-height:1;margin:1px 0 0;">'
         f'{online_count}</h3>'
-        f'<p style="font-size:7.5px;color:#9ca3af;font-weight:500;margin:1px 0 0;">'
+        f'<p style="font-size:7px;color:#9ca3af;font-weight:500;margin:1px 0 0;">'
         f'de {total_members} conectados</p>'
     )
     return HTMLResponse(content=html)
