@@ -1388,7 +1388,7 @@ def dashboard_get(request: Request):
         </div>
     </div>"""
     else:
-        muro_height     = '340px'
+        muro_height     = '180px'
         muro_height_md  = '490px'
         kpi_section = f"""
     <!-- TOP METRICS ROW (hunter ultracompact) -->
