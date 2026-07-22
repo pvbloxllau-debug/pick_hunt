@@ -1357,13 +1357,7 @@ def dashboard_get(request: Request):
                  viewBox="0 0 24 24" stroke="white" stroke-width="2.5" opacity=".5" style="flex-shrink:0;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
             </svg>
-        </button>""" if can_report else f"""
-        <div class="flex w-full bg-[#0053e2]/10 border-2 border-dashed border-[#0053e2]/30 text-[#0053e2] font-extrabold text-sm py-4 rounded-2xl items-center justify-center gap-2 uppercase tracking-wider">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            Toma un Hunt del listado!
-        </div>"""
+        </button>""" if can_report else ""
 
     # Pre-render hunts server-side — no depende de JS ni HTMX para el primer render
     initial_hunts_html = _build_hunts_html(user)
