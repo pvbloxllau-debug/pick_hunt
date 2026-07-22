@@ -402,9 +402,7 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
             <a href="/leaderboard" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition {leaderboard_class}">
                  Ranking
             </a>
-            <a href="/stats" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition {stats_class}">
-                 Metricas
-            </a>
+            {'<a href="/stats" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ' + stats_class + '"> Metricas</a>' if user['role'] != 'hunter' else ''}
             {admin_tab_desktop}
         </div>
         """
@@ -446,12 +444,8 @@ def render_template(content_html: str, user=None, active_tab: str = "dashboard")
                 </svg>
                 <span class="text-[10px] font-bold">Ranking</span>
             </a>
-            <a href="/stats" class="flex flex-col items-center gap-1 {'text-[#0053e2]' if active_tab == 'stats' else 'text-gray-400'}">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <span class="text-[10px] font-bold">Metricas</span>
-            </a>""" if user['role'] != 'picker' else ''
+            {'<a href="/stats" class="flex flex-col items-center gap-1 ' + ("text-[#0053e2]" if active_tab == "stats" else "text-gray-400") + '"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg><span class="text-[10px] font-bold">Metricas</span></a>' if user['role'] == 'supervisor' else ''}
+            """ if user['role'] != 'picker' else ''
 
         can_report = user['role'] in ('picker', 'supervisor')
 
@@ -1762,6 +1756,8 @@ def stats_get(request: Request):
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login", status_code=303)
+    if user['role'] == 'hunter':
+        return RedirectResponse(url="/dashboard", status_code=303)
         
     stats_html = """
     <div class="space-y-6">
